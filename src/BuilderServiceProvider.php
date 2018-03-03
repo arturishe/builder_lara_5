@@ -1,11 +1,12 @@
-<?php namespace Vis\Builder;
+<?php
+
+namespace Vis\Builder;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class BuilderServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap the application services.
      *
@@ -16,23 +17,23 @@ class BuilderServiceProvider extends ServiceProvider
         $router->middleware('auth.admin', \Vis\Builder\Authenticate::class);
         $router->middleware('auth.user', \Vis\Builder\AuthenticateFrontend::class);
 
-        require __DIR__ . '/../vendor/autoload.php';
-        require __DIR__ . '/Http/helpers.php';
-        require __DIR__ . '/Http/view_composers.php';
+        require __DIR__.'/../vendor/autoload.php';
+        require __DIR__.'/Http/helpers.php';
+        require __DIR__.'/Http/view_composers.php';
 
         $this->setupRoutes($this->app->router);
 
-        $this->loadViewsFrom(realpath(__DIR__ . '/resources/views'), 'admin');
+        $this->loadViewsFrom(realpath(__DIR__.'/resources/views'), 'admin');
 
         $this->publishes([
             __DIR__
-            . '/published/assets' => public_path('packages/vis/builder'),
-            __DIR__ . '/config' => config_path('builder/')
+            .'/published/assets' => public_path('packages/vis/builder'),
+            __DIR__.'/config' => config_path('builder/'),
         ], 'builder');
 
         $this->publishes([
             __DIR__
-            . '/published/assets' => public_path('packages/vis/builder')
+            .'/published/assets' => public_path('packages/vis/builder'),
         ], 'public');
     }
 
@@ -45,10 +46,10 @@ class BuilderServiceProvider extends ServiceProvider
      */
     public function setupRoutes(Router $router)
     {
-        require __DIR__ . '/Http/route_frontend.php';
-        require __DIR__ . '/Http/route_translation.php';
-        require __DIR__ . '/Http/route_settings.php';
-        require __DIR__ . '/Http/routers.php';
+        require __DIR__.'/Http/route_frontend.php';
+        require __DIR__.'/Http/route_translation.php';
+        require __DIR__.'/Http/route_settings.php';
+        require __DIR__.'/Http/routers.php';
     }
 
     /**
@@ -82,7 +83,6 @@ class BuilderServiceProvider extends ServiceProvider
             return new GeneratePassword();
         });
 
-
         $this->commands('command.admin.install');
         $this->commands('command.admin.generatePassword');
     }
@@ -91,7 +91,7 @@ class BuilderServiceProvider extends ServiceProvider
     {
         return [
             'command.admin.install',
-            'command.admin.generatePassword'
+            'command.admin.generatePassword',
         ];
     }
 }

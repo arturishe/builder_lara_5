@@ -1,18 +1,20 @@
-<?php namespace Vis\TranslationsCMS;
+<?php
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
+namespace Vis\TranslationsCMS;
+
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Model;
 
 class Trans extends Model
 {
     protected $table = 'translations_phrases_cms';
 
-    public static $rules = array(
-        'phrase' => 'required|unique:translations_phrases_cms'
-    );
+    public static $rules = [
+        'phrase' => 'required|unique:translations_phrases_cms',
+    ];
 
-    protected $fillable = array('phrase');
+    protected $fillable = ['phrase'];
 
     public $timestamps = false;
 
@@ -35,15 +37,15 @@ class Trans extends Model
         if (Cache::tags('translations')->has('translations_cms')) {
             $arrayTranslate = Cache::tags('translations')->get('translations_cms');
         } else {
-            $translationsGet = DB::table("translations_phrases_cms")->leftJoin(
+            $translationsGet = DB::table('translations_phrases_cms')->leftJoin(
                 'translations_cms',
                 'translations_cms.id_translations_phrase',
                 '=',
                 'translations_phrases_cms.id'
             )
-                ->get(array("translate", "lang", "phrase"));
+                ->get(['translate', 'lang', 'phrase']);
 
-            $arrayTranslate = array();
+            $arrayTranslate = [];
             foreach ($translationsGet as $el) {
                 $el = (array) $el;
                 $arrayTranslate[$el['phrase']][$el['lang']] = $el['translate'];

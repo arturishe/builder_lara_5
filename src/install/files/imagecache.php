@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -30,9 +30,9 @@ return array(
     |
     */
 
-    'paths' => array(
+    'paths' => [
         public_path(),
-    ),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -50,12 +50,12 @@ return array(
     |
     */
 
-    'templates' => array(
+    'templates' => [
         'small' => 'Intervention\Image\Templates\Small',
         'medium' => 'Intervention\Image\Templates\Medium',
         'large' => 'Intervention\Image\Templates\Large',
         'watermark' => 'Vis\Builder\Watermark',
-    ),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -68,4 +68,4 @@ return array(
 
     'lifetime' => 46000,
 
-);
+];

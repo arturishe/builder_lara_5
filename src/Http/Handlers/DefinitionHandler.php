@@ -1,4 +1,6 @@
-<?php namespace Vis\Builder\Handlers;
+<?php
+
+namespace Vis\Builder\Handlers;
 
 class DefinitionHandler
 {
@@ -30,7 +32,6 @@ class DefinitionHandler
     {
         $result = [];
         foreach ($this->def['fields'] as $name => $value) {
-
             if ($this->checkShowList($value)) {
                 $result[] = $this->controller->getField($name);
             }
@@ -41,11 +42,14 @@ class DefinitionHandler
 
     private function checkShowList($value)
     {
-        if ($value['type'] == 'pattern' || $value['type'] == 'definition') return false;
+        if ($value['type'] == 'pattern' || $value['type'] == 'definition') {
+            return false;
+        }
 
-        if (isset($value['hide_list']) && $value['hide_list']) return false;
+        if (isset($value['hide_list']) && $value['hide_list']) {
+            return false;
+        }
 
         return true;
     }
-
 }

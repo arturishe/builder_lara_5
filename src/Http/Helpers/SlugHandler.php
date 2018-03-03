@@ -1,7 +1,9 @@
-<?php namespace Vis\Builder\Helpers;
+<?php
 
-use Vis\Builder\Handlers\CustomHandler;
+namespace Vis\Builder\Helpers;
+
 use Vis\Builder\Facades\Jarboe;
+use Vis\Builder\Handlers\CustomHandler;
 
 class SlugHandler extends CustomHandler
 {
@@ -12,8 +14,8 @@ class SlugHandler extends CustomHandler
         $slugCheck = false;
 
         while ($slugCheck === false) {
-            $slugCheckQuery = $model::where('slug', 'like', $slug)->where("id", "!=", $response['id'])->first();
-            $slugCheckQuery ?  $slug = $slug. "-1" : $slugCheck = true;
+            $slugCheckQuery = $model::where('slug', 'like', $slug)->where('id', '!=', $response['id'])->first();
+            $slugCheckQuery ? $slug = $slug.'-1' : $slugCheck = true;
         }
 
         return $slug;
@@ -26,15 +28,14 @@ class SlugHandler extends CustomHandler
             $model::where('id', $response['id'])->update(['slug' => $this->generateUniqueSlug($response, $model)]);
         }
     }
-    
+
     public function onInsertRowResponse(array &$response)
-    {
-        $this->setSlug($response);
-    } 
-    
-    public function onUpdateRowResponse(array &$response)
     {
         $this->setSlug($response);
     }
 
+    public function onUpdateRowResponse(array &$response)
+    {
+        $this->setSlug($response);
+    }
 }

@@ -1,32 +1,34 @@
-<?php namespace Vis\Builder;
+<?php
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+namespace Vis\Builder;
+
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class Setting extends Eloquent
 {
     use \Venturecraft\Revisionable\RevisionableTrait;
 
     protected $fillable
-        = array (
+        = [
             'type',
             'title',
             'slug',
             'value',
-            'group_type'
-        );
+            'group_type',
+        ];
     protected $table = 'settings';
 
     public static $rules
-        = array (
+        = [
             'title' => 'required',
-            'slug' => 'required|max:256|unique:settings,slug,'
-        );
+            'slug' => 'required|max:256|unique:settings,slug,',
+        ];
 
     public $timestamps = false;
 
@@ -38,13 +40,12 @@ class Setting extends Eloquent
         if (Cache::tags('settings')->has($slug)) {
             return Cache::tags('settings')->get($slug);
         } else {
-            $setting = Setting::where("slug", 'like', $slug)->first();
+            $setting = self::where('slug', 'like', $slug)->first();
 
             if (isset($setting->id)) {
+                $value = $setting->value ?: $default;
 
-                $value = $setting->value ? : $default;
-
-                if ($setting->type == 2 || $setting->type == 3 || $setting->type == 5 ) {
+                if ($setting->type == 2 || $setting->type == 3 || $setting->type == 5) {
                     $value = $setting->selectValues();
                 }
 
@@ -53,10 +54,11 @@ class Setting extends Eloquent
                 return $value;
             }
         }
+    }
 
-    }  // end get
+    // end get
 
-    public static function getWithLang ($slug, $default = '')
+    public static function getWithLang($slug, $default = '')
     {
         $prefixLang = self::getPrefixLang();
         $key = $slug.$prefixLang;
@@ -64,11 +66,11 @@ class Setting extends Eloquent
         if (Cache::tags('settings')->has($key)) {
             return Cache::tags('settings')->get($key);
         } else {
-            $setting = Setting::where("slug", 'like', $slug)->first();
+            $setting = self::where('slug', 'like', $slug)->first();
 
             if (isset($setting->id)) {
-                $field = 'value' . $prefixLang;
-                $value = $setting->$field ? : $default;
+                $field = 'value'.$prefixLang;
+                $value = $setting->$field ?: $default;
 
                 Cache::tags('settings')->forever($key, $value);
 
@@ -83,25 +85,27 @@ class Setting extends Eloquent
         $defaultLocale = config('translations.config.def_locale');
 
         if ($lang != $defaultLocale) {
-            return '_' . $lang;
+            return '_'.$lang;
         }
     }
-    
-    public static function getItem ($ids)
+
+    public static function getItem($ids)
     {
-        if (!$ids) {
+        if (! $ids) {
             return [];
         }
 
-        return SettingSelect::find ($ids);
-    } //end getItem
+        return SettingSelect::find($ids);
+    }
 
-    public static function doSaveSetting ($data, $file)
+    //end getItem
+
+    public static function doSaveSetting($data, $file)
     {
         if ($data['id'] == 0) {
-            $settings = new Setting;
+            $settings = new self;
         } else {
-            $settings = Setting::find ($data['id']);
+            $settings = self::find($data['id']);
         }
 
         $settings->title = $data['title'];
@@ -110,7 +114,7 @@ class Setting extends Eloquent
         $settings->group_type = $data['group'];
 
         if ($data['type'] < 2 || $data['type'] == 6) {
-            $settings->value = $data['value' . $data['type']];
+            $settings->value = $data['value'.$data['type']];
         }
 
         //yes/no
@@ -120,26 +124,25 @@ class Setting extends Eloquent
 
         //if type file
         if ($data['type'] == 4 && $file) {
-            $destinationPath = "storage/settings";
-            $ext = $file->getClientOriginalExtension ();
-            $hashname = md5 (time ()) . '.' . $ext;
-            $full_path_img = "/" . $destinationPath . '/' . $hashname;
-            $file->move ($destinationPath, $hashname);
+            $destinationPath = 'storage/settings';
+            $ext = $file->getClientOriginalExtension();
+            $hashname = md5(time()).'.'.$ext;
+            $full_path_img = '/'.$destinationPath.'/'.$hashname;
+            $file->move($destinationPath, $hashname);
             $settings->value = $full_path_img;
         }
 
         if (count(config('builder.settings.langs')) && ($data['type'] < 2 || $data['type'] == 6)) {
             foreach (config('builder.settings.langs') as $prefix => $value) {
+                $field = 'value'.$prefix;
 
-                $field = 'value' . $prefix;
-
-                if (isset($data['value' . $data['type'].$prefix])) {
-                    $settings->$field = $data['value' . $data['type'].$prefix];
+                if (isset($data['value'.$data['type'].$prefix])) {
+                    $settings->$field = $data['value'.$data['type'].$prefix];
                 }
             }
         }
 
-        $settings->save ();
+        $settings->save();
 
         //если тип список
         if ($data['type'] == 2) {
@@ -147,24 +150,24 @@ class Setting extends Eloquent
             foreach ($data['select'] as $k => $el) {
                 $i++;
                 if ($el) {
-                    if (is_numeric ($k)) {
-                        $el = trim ($el);
+                    if (is_numeric($k)) {
+                        $el = trim($el);
                         if ($el) {
-                            $SettingSelect = SettingSelect::find ($k);
+                            $SettingSelect = SettingSelect::find($k);
                             $SettingSelect->id_setting = $settings->id;
                             $SettingSelect->value = $el;
                             $SettingSelect->priority = $i;
-                            $SettingSelect->save ();
+                            $SettingSelect->save();
                         }
                     } else {
                         foreach ($data['select']['new'] as $el_new) {
-                            $el_new = trim ($el_new);
+                            $el_new = trim($el_new);
                             if ($el_new) {
                                 $SettingSelect = new SettingSelect;
                                 $SettingSelect->id_setting = $settings->id;
                                 $SettingSelect->value = $el_new;
                                 $SettingSelect->priority = $i;
-                                $SettingSelect->save ();
+                                $SettingSelect->save();
                                 $i++;
                             }
                         }
@@ -179,20 +182,19 @@ class Setting extends Eloquent
             foreach ($data['select21'] as $k => $el) {
                 $i++;
                 if ($el) {
-                    if (is_numeric ($k)) {
-                        $el = trim ($el);
+                    if (is_numeric($k)) {
+                        $el = trim($el);
                         if ($el) {
-                            $SettingSelect = SettingSelect::find ($k);
+                            $SettingSelect = SettingSelect::find($k);
                             $SettingSelect->id_setting = $settings->id;
                             $SettingSelect->value = $el;
                             $SettingSelect->value2 = $data['select22'][$k];
                             $SettingSelect->priority = $i;
-                            $SettingSelect->save ();
+                            $SettingSelect->save();
                         }
                     } else {
-                        foreach ($data['select21']['new'] as $k_new => $el_new)
-                        {
-                            $el_new = trim ($el_new);
+                        foreach ($data['select21']['new'] as $k_new => $el_new) {
+                            $el_new = trim($el_new);
                             if ($el_new) {
                                 $SettingSelect = new SettingSelect;
                                 $SettingSelect->id_setting = $settings->id;
@@ -200,7 +202,7 @@ class Setting extends Eloquent
                                 $SettingSelect->value2
                                     = $data['select22']['new'][$k_new];
                                 $SettingSelect->priority = $i;
-                                $SettingSelect->save ();
+                                $SettingSelect->save();
                                 $i++;
                             }
                         }
@@ -215,21 +217,20 @@ class Setting extends Eloquent
             foreach ($data['select31'] as $k => $el) {
                 $i++;
                 if ($el) {
-                    if (is_numeric ($k)) {
-                        $el = trim ($el);
+                    if (is_numeric($k)) {
+                        $el = trim($el);
                         if ($el) {
-                            $SettingSelect = SettingSelect::find ($k);
+                            $SettingSelect = SettingSelect::find($k);
                             $SettingSelect->id_setting = $settings->id;
                             $SettingSelect->value = $el;
                             $SettingSelect->value2 = $data['select32'][$k];
                             $SettingSelect->value3 = $data['select33'][$k];
                             $SettingSelect->priority = $i;
-                            $SettingSelect->save ();
+                            $SettingSelect->save();
                         }
                     } else {
-                        foreach ($data['select31']['new'] as $k_new => $el_new)
-                        {
-                            $el_new = trim ($el_new);
+                        foreach ($data['select31']['new'] as $k_new => $el_new) {
+                            $el_new = trim($el_new);
                             if ($el_new) {
                                 $SettingSelect = new SettingSelect;
                                 $SettingSelect->id_setting = $settings->id;
@@ -239,7 +240,7 @@ class Setting extends Eloquent
                                 $SettingSelect->value3
                                     = $data['select33']['new'][$k_new];
                                 $SettingSelect->priority = $i;
-                                $SettingSelect->save ();
+                                $SettingSelect->save();
                                 $i++;
                             }
                         }
@@ -248,7 +249,7 @@ class Setting extends Eloquent
             }
         }
 
-        Setting::reCacheSettings ();
+        self::reCacheSettings();
 
         return $settings;
     }
@@ -256,56 +257,62 @@ class Setting extends Eloquent
     /*
     * recache settings
     */
-    public static function reCacheSettings ()
+    public static function reCacheSettings()
     {
-        Cache::tags ('settings')->flush ();
-    } // end reCacheSettings
+        Cache::tags('settings')->flush();
+    }
+
+    // end reCacheSettings
 
     /*
      * delete setting
      */
-    public static function doDelete ($id)
+    public static function doDelete($id)
     {
-        if (is_numeric ($id)) {
-            $id_page = Input::get ("id");
-            $page = Setting::find ($id_page);
+        if (is_numeric($id)) {
+            $id_page = Input::get('id');
+            $page = self::find($id_page);
 
-            Event::fire ("setting.delete", array ($page));
+            Event::fire('setting.delete', [$page]);
 
-            $page->delete ();
+            $page->delete();
 
-            Setting::reCacheSettings ();
+            self::reCacheSettings();
         }
-    } // end doDelete
+    }
 
+    // end doDelete
 
     /*
      * validation
      */
-    public static function isValid ($data, $id)
+    public static function isValid($data, $id)
     {
-        Setting::$rules['slug'] .= $id;
+        self::$rules['slug'] .= $id;
 
-        $validator = Validator::make ($data, Setting::$rules);
-        if ($validator->fails ()) {
-            return Response::json (
-                array (
+        $validator = Validator::make($data, self::$rules);
+        if ($validator->fails()) {
+            return Response::json(
+                [
                     'status' => 'error',
-                    "errors_messages" => $validator->messages ()
-                )
+                    'errors_messages' => $validator->messages(),
+                ]
             );
         } else {
             return false;
         }
-    }//end isValid
+    }
 
+    //end isValid
 
     /*
      * join settingSelect
      */
-    public function selectValues ()
+    public function selectValues()
     {
-        return $this->hasMany ('Vis\Builder\SettingSelect', 'id_setting')
-            ->orderBy ("priority")->get ()->toArray ();
-    } // end select_get
+        return $this->hasMany('Vis\Builder\SettingSelect', 'id_setting')
+            ->orderBy('priority')->get()->toArray();
+    }
+
+    // end select_get
 }

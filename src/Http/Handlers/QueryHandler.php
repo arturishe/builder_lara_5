@@ -1,13 +1,15 @@
-<?php namespace Vis\Builder\Handlers;
+<?php
+
+namespace Vis\Builder\Handlers;
 
 use Vis\Builder\JarboeController;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Session;
 
 class QueryHandler
 {
@@ -31,7 +33,7 @@ class QueryHandler
         if (isset($this->definition['cache']['tags'])) {
             $this->cache = $this->definition['cache']['tags'];
         } else {
-            $this->cache = "";
+            $this->cache = '';
         }
 
         $this->dbOptions = $this->definition['db'];
@@ -39,7 +41,6 @@ class QueryHandler
         $this->dbName = $this->definition['db']['table'];
 
         if (isset($this->definition['options']['extends']) && count($this->definition['options']['extends'])) {
-
             foreach ($this->definition['options']['extends'] as $extend) {
                 $table = $extend['table'];
                 $this->extendsTable[$table] = $table;
@@ -47,11 +48,10 @@ class QueryHandler
                 if (isset($extend['id'])) {
                     $this->extendsTableId[$table] = $extend['id'];
                 } else {
-                    $this->extendsTableId[$table] = $this->dbName . '_id';
+                    $this->extendsTableId[$table] = $this->dbName.'_id';
                 }
             }
         }
-
     }
 
     protected function getOptionDB($ident)
@@ -64,7 +64,7 @@ class QueryHandler
         return isset($this->dbOptions[$ident]);
     }
 
-    public function getRows($isPagination = true, $isUserFilters = true, $betweenWhere = array(), $isSelectAll = false)
+    public function getRows($isPagination = true, $isUserFilters = true, $betweenWhere = [], $isSelectAll = false)
     {
         $this->checkExistTable();
 
@@ -74,7 +74,7 @@ class QueryHandler
         $this->prepareSelectValues();
 
         if ($isSelectAll) {
-            $this->db->addSelect($this->dbName .'.*');
+            $this->db->addSelect($this->dbName.'.*');
         }
 
         $this->prepareFilterValues();
@@ -91,22 +91,21 @@ class QueryHandler
 
         $this->dofilter();
 
-        $sessionPath = 'table_builder.' . $this->definitionName . '.order';
-        $order = Session::get($sessionPath, array());
-        
-        if ($order && $isUserFilters) {
-             $this->db->orderBy($this->dbName .'.'. $order['field'], $order['direction']);
-        } elseif ($this->hasOptionDB('order')) {
+        $sessionPath = 'table_builder.'.$this->definitionName.'.order';
+        $order = Session::get($sessionPath, []);
 
+        if ($order && $isUserFilters) {
+            $this->db->orderBy($this->dbName.'.'.$order['field'], $order['direction']);
+        } elseif ($this->hasOptionDB('order')) {
             $order = $this->getOptionDB('order');
 
             foreach ($order as $field => $direction) {
-                 $this->db->orderBy($this->dbName .'.'. $field, $direction);
+                $this->db->orderBy($this->dbName.'.'.$field, $direction);
             }
         }
 
         if ($betweenWhere) {
-            $betweenField  = $betweenWhere['field'];
+            $betweenField = $betweenWhere['field'];
             $betweenValues = $betweenWhere['values'];
 
             $this->db->whereBetween($betweenField, $betweenValues);
@@ -125,8 +124,8 @@ class QueryHandler
 
     private function dofilter()
     {
-        if (Input::has("filter")) {
-            $filters = Input::get("filter");
+        if (Input::has('filter')) {
+            $filters = Input::get('filter');
 
             foreach ($filters as $nameField => $valueField) {
                 if ($valueField) {
@@ -138,14 +137,14 @@ class QueryHandler
 
     public function getPerPageAmount($info)
     {
-        if (!is_array($info)) {
+        if (! is_array($info)) {
             return $info;
         }
 
-        $sessionPath = 'table_builder.' . $this->definitionName . '.per_page';
+        $sessionPath = 'table_builder.'.$this->definitionName.'.per_page';
         $perPage = Session::get($sessionPath);
 
-        if (!$perPage) {
+        if (! $perPage) {
             $keys = array_keys($info);
             $perPage = $keys[0];
         }
@@ -155,9 +154,10 @@ class QueryHandler
 
     protected function prepareFilterValues()
     {
-        $filters = isset($this->definition['filters']) ? $this->definition['filters'] : array();
+        $filters = isset($this->definition['filters']) ? $this->definition['filters'] : [];
         if (is_callable($filters)) {
             $filters($this->db);
+
             return;
         }
 
@@ -168,7 +168,7 @@ class QueryHandler
 
     protected function doPrependFilterValues(&$values)
     {
-        $filters = isset($this->definition['filters']) ? $this->definition['filters'] : array();
+        $filters = isset($this->definition['filters']) ? $this->definition['filters'] : [];
         if (is_callable($filters)) {
             return;
         }
@@ -180,25 +180,25 @@ class QueryHandler
 
     protected function prepareSelectValues()
     {
-        $this->db = $this->db->select($this->dbName .'.id');
+        $this->db = $this->db->select($this->dbName.'.id');
 
         if (isset($this->definition['options']['is_sortable']) && $this->definition['options']['is_sortable']) {
-            if (!Schema::hasColumn($this->dbName, "priority")) {
+            if (! Schema::hasColumn($this->dbName, 'priority')) {
                 Schema::table(
                     $this->dbName,
                     function ($table) {
-                        $table->integer("priority");
+                        $table->integer('priority');
                     }
                 );
             }
 
-            $this->db = $this->db->addSelect($this->dbName .'.priority');
+            $this->db = $this->db->addSelect($this->dbName.'.priority');
         }
 
         $fields = $this->controller->getFields();
 
         foreach ($fields as $name => $field) {
-             $field->onSelectValue($this->db);
+            $field->onSelectValue($this->db);
         }
     }
 
@@ -212,7 +212,6 @@ class QueryHandler
             }
         }
 
-
         $this->prepareSelectValues();
 
         $this->db->where($this->dbName.'.id', $id);
@@ -222,22 +221,22 @@ class QueryHandler
 
     private function checkExistTable()
     {
-        if (!Session::has($this->dbName . "_exist")) {
-            if (!Schema::hasTable($this->dbName)) {
+        if (! Session::has($this->dbName.'_exist')) {
+            if (! Schema::hasTable($this->dbName)) {
                 Schema::create($this->dbName, function ($table) {
                     $table->increments('id');
                 });
             }
         }
 
-        Session::push($this->dbName . "_exist", 'created');
+        Session::push($this->dbName.'_exist', 'created');
     }
 
     protected function onSearchFilterQuery()
     {
-        $sessionPath = 'table_builder.' . $this->definitionName . '.filters';
+        $sessionPath = 'table_builder.'.$this->definitionName.'.filters';
 
-        $filters = Session::get($sessionPath, array());
+        $filters = Session::get($sessionPath, []);
         foreach ($filters as $name => $value) {
             if ($this->controller->hasCustomHandlerMethod('onSearchFilter')) {
                 $res = $this->controller->getCustomHandler()->onSearchFilter($this->db, $name, $value);
@@ -256,9 +255,11 @@ class QueryHandler
 
         if ($this->controller->hasCustomHandlerMethod('handleUpdateRow')) {
             $res = $this->controller->getCustomHandler()->handleUpdateRow($values);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
-        
+
         $updateData = $this->getRowQueryValues($values);
 
         $model = $this->model;
@@ -271,16 +272,15 @@ class QueryHandler
 
         $modelObj = $model::find($values['id']);
 
-        if (method_exists($modelObj, "setFillable")) {
+        if (method_exists($modelObj, 'setFillable')) {
             $modelObj->setFillable(array_keys($updateData));
         }
 
         foreach ($updateData as $fild => $data) {
             if (is_array($data)) {
-
-                if (isset($def['fields'][$fild]['multi']) &&  $def['fields'][$fild]['multi']) {
+                if (isset($def['fields'][$fild]['multi']) && $def['fields'][$fild]['multi']) {
                     foreach ($data as $k => $dataElement) {
-                        if (!$dataElement) {
+                        if (! $dataElement) {
                             unset($data[$k]);
                         }
                     }
@@ -295,8 +295,6 @@ class QueryHandler
                 $updateDataRes[$fild] = $data;
             }
         }
-
-
 
         $modelObj->update($updateDataRes);
 
@@ -315,10 +313,10 @@ class QueryHandler
 
         $this->updateExtendsTable($values['id']);
 
-        $res = array(
+        $res = [
             'id'     => $values['id'],
-            'values' => $updateData
-        );
+            'values' => $updateData,
+        ];
         if ($this->controller->hasCustomHandlerMethod('onUpdateRowResponse')) {
             $this->controller->getCustomHandler()->onUpdateRowResponse($res);
         }
@@ -333,7 +331,7 @@ class QueryHandler
             $group = Input::get($nameField);
             $tableUse = $field->getAttribute('use_table')['table'];
             $fieldForeign = $field->getAttribute('use_table')['id'];
-            DB::table ($tableUse)->where($fieldForeign, $id)->delete();
+            DB::table($tableUse)->where($fieldForeign, $id)->delete();
 
             foreach ($group as $name => $arrayValue) {
                 foreach ($arrayValue as $k => $item) {
@@ -343,18 +341,15 @@ class QueryHandler
             }
 
             if (isset($resultArray)) {
-                DB::table($tableUse)->insert ($resultArray);
+                DB::table($tableUse)->insert($resultArray);
             }
-
         }
     }
 
     public function updateExtendsTable($id)
     {
         if (count($this->extendsFields)) {
-
             foreach ($this->extendsFields as $tableEx => $fields) {
-
                 $table = DB::table($tableEx);
 
                 $hasExistRecord = DB::table($tableEx)->where($this->extendsTableId[$tableEx], $id)->count();
@@ -364,9 +359,7 @@ class QueryHandler
                     $fields[$this->extendsTableId[$tableEx]] = $id;
                     $table->insert($fields);
                 }
-
             }
-
         }
     }
 
@@ -376,11 +369,13 @@ class QueryHandler
 
         if ($this->controller->hasCustomHandlerMethod('handleCloneRow')) {
             $res = $this->controller->getCustomHandler()->handleCloneRow($id);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
         $this->db = DB::table($this->dbName);
-        $page = (array) $this->db->where("id", $id)->select("*")->first();
-        Event::fire("table.clone", array($this->dbName, $id));
+        $page = (array) $this->db->where('id', $id)->select('*')->first();
+        Event::fire('table.clone', [$this->dbName, $id]);
 
         unset($page['id']);
 
@@ -388,18 +383,17 @@ class QueryHandler
 
         $this->cloneExtendsTables($id, $newId);
 
-        return array(
+        return [
             'id'     => $id,
             'status' => $page,
-        );;
+        ];
     }
 
     private function cloneExtendsTables($id, $newId)
     {
         if (isset($this->extendsTable) && count($this->extendsTable)) {
-
             foreach ($this->extendsTable as $table) {
-                $page = (array) DB::table($table)->where($this->extendsTableId[$table], $id)->select("*")->first();
+                $page = (array) DB::table($table)->where($this->extendsTableId[$table], $id)->select('*')->first();
                 unset($page['id']);
                 $page[$this->extendsTableId[$table]] = $newId;
                 DB::table($table)->insertGetId($page);
@@ -413,7 +407,9 @@ class QueryHandler
 
         if ($this->controller->hasCustomHandlerMethod('handleDeleteRow')) {
             $res = $this->controller->getCustomHandler()->handleDeleteRow($id);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
 
         foreach ($this->controller->getPatterns() as $pattern) {
@@ -423,12 +419,12 @@ class QueryHandler
         $model = $this->model;
         $res = $model::find($id)->delete();
 
-        Event::fire("table.delete", array($this->dbName, $id));
+        Event::fire('table.delete', [$this->dbName, $id]);
 
-        $res = array(
+        $res = [
             'id'     => $id,
-            'status' => $res
-        );
+            'status' => $res,
+        ];
 
         $this->deleteExtendsTables($id);
 
@@ -442,7 +438,6 @@ class QueryHandler
     private function deleteExtendsTables($id)
     {
         if (isset($this->extendsTable) && count($this->extendsTable)) {
-
             foreach ($this->extendsTable as $table) {
                 DB::table($table)->where($this->extendsTableId[$table], $id)->delete();
             }
@@ -466,14 +461,16 @@ class QueryHandler
     public function insertRow($values)
     {
         $this->clearCache();
-        
+
         if ($this->controller->hasCustomHandlerMethod('handleInsertRow')) {
             $res = $this->controller->getCustomHandler()->handleInsertRow($values);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
 
         $insertData = $this->getRowQueryValues($values);
-        
+
         $this->checkFields($insertData);
 
         $this->doValidate($insertData);
@@ -482,14 +479,12 @@ class QueryHandler
             $id = $this->controller->getCustomHandler()->onInsertRowData($insertData);
         }
 
-        if (!$id) {
-
+        if (! $id) {
             foreach ($insertData as $fild => $data) {
                 if (is_array($data)) {
-
-                    if (isset($this->definition['fields'][$fild]['multi']) &&  $this->definition['fields'][$fild]['multi']) {
+                    if (isset($this->definition['fields'][$fild]['multi']) && $this->definition['fields'][$fild]['multi']) {
                         foreach ($data as $k => $dataElement) {
-                            if (!$dataElement) {
+                            if (! $dataElement) {
                                 unset($data[$k]);
                             }
                         }
@@ -531,10 +526,10 @@ class QueryHandler
 
         $this->updateExtendsTable($id);
 
-        $res = array(
+        $res = [
             'id' => $id,
-            'values' => $insertData
-        );
+            'values' => $insertData,
+        ];
 
         if ($this->controller->hasCustomHandlerMethod('onInsertRowResponse')) {
             $this->controller->getCustomHandler()->onInsertRowResponse($res);
@@ -546,13 +541,13 @@ class QueryHandler
     private function onManyToManyValues($ident, $values, $id)
     {
         $field = $this->controller->getField($ident);
-        $vals = isset($values[$ident]) ? $values[$ident] : array();
+        $vals = isset($values[$ident]) ? $values[$ident] : [];
         $field->onPrepareRowValues($vals, $id);
     }
 
     private function doValidate($values)
     {
-        $errors = array();
+        $errors = [];
         $fields = $this->definition['fields'];
 
         foreach ($fields as $ident => $options) {
@@ -561,16 +556,15 @@ class QueryHandler
                 if ($field->isPattern()) {
                     continue;
                 }
-                
+
                 $tabs = $field->getAttribute('tabs');
                 if ($tabs) {
-                    if (!$field->getAttribute('extends_table')) {
+                    if (! $field->getAttribute('extends_table')) {
                         foreach ($tabs as $tab) {
-                            $fieldName = $ident . $tab['postfix'];
+                            $fieldName = $ident.$tab['postfix'];
                             $field->doValidate($values[$fieldName]);
                         }
                     }
-
                 } else {
                     if (array_key_exists($ident, $values)) {
                         $field->doValidate($values[$ident]);
@@ -605,7 +599,7 @@ class QueryHandler
             $tabs = $field->getAttribute('tabs');
             if ($tabs) {
                 foreach ($tabs as $tab) {
-                    $fieldName = $ident . $tab['postfix'];
+                    $fieldName = $ident.$tab['postfix'];
                     $values[$fieldName] = $field->prepareQueryValue($values[$fieldName]);
 
                     if ($field->getAttribute('extends_table') && array_key_exists($fieldName, $values)) {
@@ -616,7 +610,6 @@ class QueryHandler
                 }
             } else {
                 if (array_key_exists($ident, $values)) {
-                 
                     if ($field->getAttribute('extends_table')) {
                         $this->extendsFields[$field->getAttribute('extends_table')][$ident] = $field->prepareQueryValue($values[$ident]);
                         unset($values[$ident]);
@@ -645,7 +638,7 @@ class QueryHandler
                 unset($values[$key]);
             }
         }
-        
+
         // patterns
         unset($values['pattern']);
 
@@ -663,17 +656,17 @@ class QueryHandler
         foreach ($fields as $ident => $options) {
             $field = $this->controller->getField($ident);
 
-            if (method_exists($field, 'getNewValueId') && isset($values[$ident . '_new_foreign'])) {
-                if ($new_id = $field->getNewValueId($values[$ident . '_new_foreign'])) {
+            if (method_exists($field, 'getNewValueId') && isset($values[$ident.'_new_foreign'])) {
+                if ($new_id = $field->getNewValueId($values[$ident.'_new_foreign'])) {
                     $values[$ident] = $new_id;
                 }
-                unset($values[$ident . '_new_foreign']);
+                unset($values[$ident.'_new_foreign']);
             }
 
             if ($field->isPattern()) {
                 continue;
             }
-            
+
             $tabs = $field->getAttribute('tabs');
 
             if ($tabs) {
@@ -690,14 +683,14 @@ class QueryHandler
 
     private function checkField($values, $ident, $field)
     {
-        if (!$field->isEditable()) {
+        if (! $field->isEditable()) {
             throw new \RuntimeException("Field [{$ident}] is not editable");
         }
     }
 
     public function clearOrderBy()
     {
-        $sessionPath = 'table_builder.' . $this->definitionName . '.order';
+        $sessionPath = 'table_builder.'.$this->definitionName.'.order';
         Session::forget($sessionPath);
 
         return true;
@@ -715,22 +708,20 @@ class QueryHandler
             if (isset($cache['keys'])) {
                 Cache::forget($cache['keys']);
             }
-
         }
     }
 
     public function getUploadedFiles()
     {
-        $list = File::files(public_path() . "/storage/files");
+        $list = File::files(public_path().'/storage/files');
 
         $data = [
             'status' => 'success',
-            'data'   => view('admin::tb.files_list', compact('list'))->render()
+            'data'   => view('admin::tb.files_list', compact('list'))->render(),
         ];
 
         return $data;
     }
-
 
     public function getUploadedImages($field)
     {
@@ -744,33 +735,33 @@ class QueryHandler
     private function getImagesWithImageStorage()
     {
         if (class_exists('\Vis\ImageStorage\Image')) {
-            $list = \Vis\ImageStorage\Image::orderBy ('created_at', 'desc');
+            $list = \Vis\ImageStorage\Image::orderBy('created_at', 'desc');
 
             if (Input::get('tag')) {
-                $list->leftJoin('vis_tags2entities', 'id_entity', '=' , 'vis_images.id')->where('entity_type', 'Vis\ImageStorage\Image')->where('id_tag', Input::get('tag'));
+                $list->leftJoin('vis_tags2entities', 'id_entity', '=', 'vis_images.id')->where('entity_type', 'Vis\ImageStorage\Image')->where('id_tag', Input::get('tag'));
             }
 
             if (Input::get('gallary')) {
-                $list->leftJoin('vis_images2galleries', 'id_image', '=' , 'vis_images.id')->where('id_gallery', Input::get('gallary'));
+                $list->leftJoin('vis_images2galleries', 'id_image', '=', 'vis_images.id')->where('id_gallery', Input::get('gallary'));
             }
 
             if (Input::get('q')) {
-                $list->where('vis_images.title', 'like', Input::get('q'). '%');
+                $list->where('vis_images.title', 'like', Input::get('q').'%');
             }
 
             $list = $list->groupBy('vis_images.id')->paginate(18);
 
-            $tags = \Vis\ImageStorage\Tag::where('is_active', 1)->orderBy ('title', 'asc')->get ();
-            $galleries = \Vis\ImageStorage\Gallery::where('is_active', 1)->orderBy ('title', 'asc')->get ();
+            $tags = \Vis\ImageStorage\Tag::where('is_active', 1)->orderBy('title', 'asc')->get();
+            $galleries = \Vis\ImageStorage\Gallery::where('is_active', 1)->orderBy('title', 'asc')->get();
 
             $data = [
                 'status' => 'success',
-                'data' => view ('admin::tb.image_storage_list', compact ('list', 'tags', 'galleries'))->render ()
+                'data' => view('admin::tb.image_storage_list', compact('list', 'tags', 'galleries'))->render(),
             ];
         } else {
             $data = [
                 'status' => 'success',
-                'data' => 'Не подключен пакет ImageStorage'
+                'data' => 'Не подключен пакет ImageStorage',
             ];
         }
 
@@ -782,14 +773,14 @@ class QueryHandler
         $files = collect(File::files(public_path('storage/editor/fotos')));
         $page = (int) request('page') ?: 1;
         $onPage = 24;
-        $slice = $files->slice(($page-1)* $onPage, $onPage);
+        $slice = $files->slice(($page - 1) * $onPage, $onPage);
 
         $list = new \Illuminate\Pagination\LengthAwarePaginator($slice, $files->count(), $onPage);
         $list->setPath(url()->current());
 
         $data = [
             'status' => 'success',
-            'data'   => view('admin::tb.images_list', compact('list'))->render()
+            'data'   => view('admin::tb.images_list', compact('list'))->render(),
         ];
 
         return $data;

@@ -1,12 +1,12 @@
 <?php
 
-return array(
+return [
     'caption'  => 'Административная часть сайта',
     'logo_url' => '/packages/vis/builder/img/logo.png',
     'favicon_url' => '/packages/vis/builder/img/favicon/favicon.ico',
     'uri' => '/admin',
-    'limitation_of_ip' => array(),
-    'menu' => array(
+    'limitation_of_ip' => [],
+    'menu' => [
 
         /* array(
              'title' => 'Главная',
@@ -17,38 +17,38 @@ return array(
              }
          ),*/
 
-        array(
+        [
             'title' => 'Структура сайта',
             'icon'  => 'sitemap',
             'link'  => '/tree',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
+            },
+        ],
 
-        array(
+        [
             'title' => 'Статьи',
             'icon'  => 'building',
             'link'  => '/articles',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
+            },
+        ],
 
-        array(
+        [
             'title' => 'Настройки',
             'icon'  => 'cog',
-            'submenu' => array(
-                array(
-                    'title' => "Управление",
-                    'submenu' => array(
-                        array(
+            'submenu' => [
+                [
+                    'title' => 'Управление',
+                    'submenu' => [
+                        [
                             'title' => 'Общее',
                             'link'  => '/settings/settings_all?group=general',
-                            'check' => function() {
+                            'check' => function () {
                                 return true;
-                            }
-                        ),
+                            },
+                        ],
                         /*  array(
                              'title' => 'SEO',
                              'link'  => '/settings/settings_all?group=seo',
@@ -77,54 +77,54 @@ return array(
                                  return true;
                              }
                          ),*/
-                    ),
-                    'check' => function() {
+                    ],
+                    'check' => function () {
                         return true;
-                    }
-                ),
-                array(
+                    },
+                ],
+                [
                     'title' => 'Переводы CMS',
                     'link'  => '/translations_cms/phrases',
-                    'check' => function() {
+                    'check' => function () {
                         return true;
-                    }
-                ),
-                array(
+                    },
+                ],
+                [
                     'title' => 'Логирование',
                     'link'  => '/events',
-                    'check' => function() {
+                    'check' => function () {
                         return true;
-                    }
-                ),
-                array(
+                    },
+                ],
+                [
                     'title' => 'Контроль изменений',
                     'link'  => '/revisions',
-                    'check' => function() {
+                    'check' => function () {
                         return true;
-                    }
-                )
-            )
-        ),
+                    },
+                ],
+            ],
+        ],
 
-        array(
+        [
             'title' => 'Упр. пользователями',
             'icon'  => 'user',
-            'submenu' => array(
-                array(
-                    'title' => "Пользователи",
+            'submenu' => [
+                [
+                    'title' => 'Пользователи',
                     'link'  => '/users',
-                    'check' => function() {
+                    'check' => function () {
                         return true;
-                    }
-                ),
-                array(
-                    'title' => "Группы",
+                    },
+                ],
+                [
+                    'title' => 'Группы',
                     'link'  => '/groups',
-                    'check' => function() {
+                    'check' => function () {
                         return true;
-                    }
-                )
-            )
-        ),
-    ),
-);
+                    },
+                ],
+            ],
+        ],
+    ],
+];

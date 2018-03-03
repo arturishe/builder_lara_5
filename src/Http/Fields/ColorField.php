@@ -6,13 +6,14 @@ use Illuminate\Support\Facades\View;
 
 class ColorField extends AbstractField
 {
-
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
-        $db->where($table .'.'. $this->getFieldName(), 'LIKE', '%'.$value.'%');
-    } // end onSearchFilter
-    
+        $db->where($table.'.'.$this->getFieldName(), 'LIKE', '%'.$value.'%');
+    }
+
+    // end onSearchFilter
+
     public function getListValue($row)
     {
         if ($this->hasCustomHandlerMethod('onGetListValue')) {
@@ -22,10 +23,12 @@ class ColorField extends AbstractField
             }
         }
 
-        return '<span style="height: 20px; width:20px; display:inline-block; background-color: '. $this->getValue($row) .';"></spans>';
-    } // end getListValue
+        return '<span style="height: 20px; width:20px; display:inline-block; background-color: '.$this->getValue($row).';"></spans>';
+    }
 
-    public function getEditInput($row = array())
+    // end getListValue
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -36,11 +39,13 @@ class ColorField extends AbstractField
 
         $input = View::make('admin::tb.input_color');
         $input->value = $this->getValue($row);
-        $input->name  = $this->getFieldName();
-        $input->type  = $this->getAttribute('color_type', 'hex');
+        $input->name = $this->getFieldName();
+        $input->type = $this->getAttribute('color_type', 'hex');
         $input->default = $this->getAttribute('default', '');
         $input->comment = $this->getAttribute('comment');
 
         return $input->render();
-    } // end getEditInput
+    }
+
+    // end getEditInput
 }

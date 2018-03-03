@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     'is_active_remember_me' => false,
 
@@ -8,13 +8,13 @@ return array(
 
     'email_support' => 'support@vis-design.com',
 
-    'bottom_block' => "",
-    
+    'bottom_block' => '',
+
     // callbacks
-    'on_login' => function() {
-     //  return \Redirect::to('/admin/tree');
+    'on_login' => function () {
+        //  return \Redirect::to('/admin/tree');
     },
-    'on_logout' => function() {
+    'on_logout' => function () {
         return \Redirect::to('/');
     },
-);
+];

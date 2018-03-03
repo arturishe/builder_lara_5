@@ -4,30 +4,35 @@ namespace Vis\Builder\Fields;
 
 class TextareaField extends AbstractField
 {
-
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
         $tabs = $this->getAttribute('tabs');
         if ($tabs) {
-            $field = $table .'.'. $this->getFieldName();
+            $field = $table.'.'.$this->getFieldName();
             $db->where(function ($query) use ($field, $value, $tabs) {
                 foreach ($tabs as $tab) {
-                    $query->orWhere($field . $tab['postfix'], 'LIKE', '%'.$value.'%');
+                    $query->orWhere($field.$tab['postfix'], 'LIKE', '%'.$value.'%');
                 }
             });
         } else {
-            $db->where($table .'.'. $this->getFieldName(), 'LIKE', '%'.$value.'%');
+            $db->where($table.'.'.$this->getFieldName(), 'LIKE', '%'.$value.'%');
         }
-    } // end onSearchFilter
-    
+    }
+
+    // end onSearchFilter
+
     public function getLabelClass()
     {
         return 'textarea';
-    } // end getLabelClass
+    }
+
+    // end getLabelClass
 }

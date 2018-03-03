@@ -47,7 +47,7 @@ class Builder extends \Illuminate\Database\Query\Builder
      */
     public function get($columns = ['*'])
     {
-        if ( ! is_null($this->cacheMinutes)) {
+        if (! is_null($this->cacheMinutes)) {
             return $this->getCached($columns);
         }
 
@@ -203,16 +203,16 @@ class Builder extends \Illuminate\Database\Query\Builder
     }
 
     /**
-     * Flush the cache for the current model or a given tag name
+     * Flush the cache for the current model or a given tag name.
      *
      * @param  mixed  $cacheTags
-     * @return boolean
+     * @return bool
      */
     public function flushCache($cacheTags = null)
     {
         $store = app('cache')->getStore();
 
-        if ( ! method_exists($store, 'tags')) {
+        if (! method_exists($store, 'tags')) {
             return false;
         }
 
@@ -251,12 +251,15 @@ class Builder extends \Illuminate\Database\Query\Builder
 
         return $this;
     }
-    
-    public function reOrderBy($column, $direction = 'asc') {
-      $this->orders = null;
 
-      if ( !is_null($column) ) return $this->orderBy($column, $direction);
+    public function reOrderBy($column, $direction = 'asc')
+    {
+        $this->orders = null;
 
-      return $this;
+        if (! is_null($column)) {
+            return $this->orderBy($column, $direction);
+        }
+
+        return $this;
     }
 }

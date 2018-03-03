@@ -1,4 +1,5 @@
 <?php
+
 namespace Vis\Builder\Fields;
 
 use Illuminate\Support\Facades\DB;
@@ -9,14 +10,18 @@ class GroupField extends AbstractField
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function onSearchFilter(&$db, $value)
     {
         $db->where($this->getFieldName(), 'LIKE', '%'.$value.'%');
-    } // end onSearchFilter
+    }
 
-    public function getEditInput($row = array())
+    // end onSearchFilter
+
+    public function getEditInput($row = [])
     {
         $type = $this->getAttribute('type');
         $valueArray = $this->getValue($row);
@@ -24,34 +29,33 @@ class GroupField extends AbstractField
         $section = [];
 
         if (count($valueArray)) {
-
             foreach ($valueArray as $nameVal => $val) {
                 foreach ($val as $k => $res) {
                     $section[$k][$nameVal] = $res;
                 }
             }
-            
+
             foreach ($section as $k => $param) {
                 foreach ($param as $nameParam => $valParam) {
                     if (isset($filds[$nameParam]['type'])) {
-                        $nameClass = "Vis\\Builder\\Fields\\".ucfirst($filds[$nameParam]['type'])."Field";
+                        $nameClass = 'Vis\\Builder\\Fields\\'.ucfirst($filds[$nameParam]['type']).'Field';
 
-                        $resultObjectFild =  new $nameClass($nameParam, $filds[$nameParam] , $this->options, $this->definition, $this->handler);
+                        $resultObjectFild = new $nameClass($nameParam, $filds[$nameParam], $this->options, $this->definition, $this->handler);
                         $sectionResult[$k][$nameParam] = $filds[$nameParam];
 
                         if (isset($filds[$nameParam]['tabs'])) {
                             $sectionResult[$k][$nameParam]['html'] = $resultObjectFild->getTabbedEditInput($param);
                         } else {
-                            $sectionResult[$k][$nameParam]['html'] = $resultObjectFild->getEditInput(array($nameParam => $valParam));
+                            $sectionResult[$k][$nameParam]['html'] = $resultObjectFild->getEditInput([$nameParam => $valParam]);
                         }
                     }
                 }
             }
         } else {
             foreach ($filds as $name => $fild) {
-                $nameClass = "Vis\\Builder\\Fields\\".ucfirst($fild['type'])."Field";
+                $nameClass = 'Vis\\Builder\\Fields\\'.ucfirst($fild['type']).'Field';
 
-                $resultObjectFild =  new $nameClass($name, $fild , $this->options, $this->definition, $this->handler);
+                $resultObjectFild = new $nameClass($name, $fild, $this->options, $this->definition, $this->handler);
                 $sectionResult[0][$name] = $fild;
                 if (isset($fild['tabs'])) {
                     $sectionResult[0][$name]['html'] = $resultObjectFild->getTabbedEditInput();
@@ -61,28 +65,34 @@ class GroupField extends AbstractField
             }
         }
 
-
-        $input = View::make('admin::tb.input_'. $type);
+        $input = View::make('admin::tb.input_'.$type);
         $input->value = $valueArray;
-        $input->name  = $this->getFieldName();
-        $input->rows  = $sectionResult;
+        $input->name = $this->getFieldName();
+        $input->rows = $sectionResult;
         $input->hideAdd = $this->getAttribute('hide_add');
-        $input->hideDelete= $this->getAttribute('hide_delete');
+        $input->hideDelete = $this->getAttribute('hide_delete');
 
         return $input->render();
-    } // end getEditInput
+    }
+
+    // end getEditInput
 
     public function getAttribute($ident, $default = false)
     {
-        if ($ident == 'hide_list') return true;
+        if ($ident == 'hide_list') {
+            return true;
+        }
 
-        return parent::getAttribute ($ident, $default);
-    } // end getAttribute
+        return parent::getAttribute($ident, $default);
+    }
+
+    // end getAttribute
 
     private function isJson($string)
     {
         json_decode($string);
-        return (json_last_error() == JSON_ERROR_NONE);
+
+        return json_last_error() == JSON_ERROR_NONE;
     }
 
     public function getValue($row, $postfix = '')
@@ -90,12 +100,11 @@ class GroupField extends AbstractField
         $valueArray = [];
 
         if ($this->ifUseTable()) {
-
             $tableUse = $this->getAttribute('use_table')['table'];
             $fieldForeign = $this->getAttribute('use_table')['id'];
 
             if (isset($row['id'])) {
-                $values = DB::table ($tableUse)->where($fieldForeign, $row['id'])->get();
+                $values = DB::table($tableUse)->where($fieldForeign, $row['id'])->get();
 
                 foreach ($values as $arrValues) {
                     foreach ($arrValues as $name => $v) {
@@ -105,23 +114,21 @@ class GroupField extends AbstractField
 
                 unset($valueArray[$fieldForeign]);
             }
+        } else {
+            $valueJson = parent::getValue($row);
 
-         } else {
-            $valueJson = parent::getValue ($row);
-
-            if ($valueJson && $this->isJson ($valueJson)) {
-                $valueArray = json_decode ($valueJson);
+            if ($valueJson && $this->isJson($valueJson)) {
+                $valueArray = json_decode($valueJson);
             }
         }
-
 
         return  $valueArray;
     }
 
     public function onSelectValue(&$db)
     {
-        if (!$this->ifUseTable()) {
-            return parent::onSelectValue ($db);
+        if (! $this->ifUseTable()) {
+            return parent::onSelectValue($db);
         }
     }
 

@@ -6,283 +6,370 @@ use Vis\Builder\JarboeController;
 
 class CustomClosureHandler
 {
-    
     public $controller;
-    private $functions = array();
-
+    private $functions = [];
 
     public function __construct($functions, JarboeController $controller)
     {
         $this->functions = $functions;
         $this->controller = $controller;
-    } // end __construct
+    }
+
+    // end __construct
 
     private function getClosure($name)
     {
         return isset($this->functions[$name]) ? $this->functions[$name] : false;
-    } // end isExist
-    
+    }
+
+    // end isExist
+
     //
     public function handle()
     {
         $closure = $this->getClosure('handle');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure();
         }
-    } // end handle
+    }
+
+    // end handle
 
     public function onGetValue($formField, array &$row, &$postfix)
     {
         $closure = $this->getClosure('onGetValue');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $row, $postfix);
         }
-    } // end onGetValue
-    
+    }
+
+    // end onGetValue
+
     public function onGetExportValue($formField, $type, array &$row, &$postfix)
     {
         $closure = $this->getClosure('onGetExportValue');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $type, $row, $postfix);
         }
-    } // end onGetExportValue
+    }
+
+    // end onGetExportValue
 
     public function onGetEditInput($formField, array &$row)
     {
         $closure = $this->getClosure('onGetEditInput');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $row);
         }
-    } // end onGetEditInput
-    
+    }
+
+    // end onGetEditInput
+
     public function onGetListValue($formField, array &$row)
     {
         $closure = $this->getClosure('onGetListValue');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $row);
         }
-    } // end onGetListValue
-    
+    }
+
+    // end onGetListValue
+
     public function onSelectField($formField, &$db)
     {
         $closure = $this->getClosure('onSelectField');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $db);
         }
-    } // end onSelectField
+    }
+
+    // end onSelectField
 
     public function onPrepareSearchFilters(array &$filters)
     {
         $closure = $this->getClosure('onPrepareSearchFilters');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($filters);
         }
-    } // end onPrepareSearchFilters
-    
+    }
+
+    // end onPrepareSearchFilters
+
     public function onSearchFilter(&$db, $name, $value)
     {
         $closure = $this->getClosure('onSearchFilter');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($db, $name, $value);
         }
-    } // end onSearchFilter
+    }
+
+    // end onSearchFilter
 
     public function onViewFilter()
     {
         $closure = $this->getClosure('onViewFilter');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure();
         }
-    } // end onSearchFilter
+    }
+
+    // end onSearchFilter
 
     public function onUpdateRowResponse(array &$response)
     {
         $closure = $this->getClosure('onUpdateRowResponse');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($response);
         }
-    } // end onUpdateRowResponse
+    }
+
+    // end onUpdateRowResponse
 
     public function onInsertRowResponse(array &$response)
     {
         $closure = $this->getClosure('onInsertRowResponse');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($response);
         }
-    } // end onInsertRowResponse
+    }
+
+    // end onInsertRowResponse
 
     public function onDeleteRowResponse(array &$response)
     {
         $closure = $this->getClosure('onDeleteRowResponse');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($response);
         }
-    } // end onDeleteRowResponse
-    
+    }
+
+    // end onDeleteRowResponse
+
     public function handleDeleteRow($id)
     {
         $closure = $this->getClosure('handleDeleteRow');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($id);
         }
-    } // end handleDeleteRow
-    
+    }
+
+    // end handleDeleteRow
+
     public function handleInsertRow($values)
     {
         $closure = $this->getClosure('handleInsertRow');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($values);
         }
+    }
 
-    } // end handleInsertRow
-    
+    // end handleInsertRow
+
     public function handleUpdateRow($values)
     {
         $closure = $this->getClosure('handleUpdateRow');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($values);
         }
-    } // end handleUpdateRow
-    
+    }
+
+    // end handleUpdateRow
+
     public function onUpdateFastRowResponse(array &$response)
     {
         $closure = $this->getClosure('onUpdateFastRowResponse');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($response);
         }
-    } // end onUpdateFastRowResponse
-    
+    }
+
+    // end onUpdateFastRowResponse
+
     public function onInsertRowData(array &$data)
     {
         $closure = $this->getClosure('onInsertRowData');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($data);
         }
-    } // end onInsertRowData
-    
+    }
+
+    // end onInsertRowData
+
     public function onUpdateRowData(array &$data)
     {
         $closure = $this->getClosure('onUpdateRowData');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($data);
         }
-    } // end onUpdateRowData
-    
+    }
+
+    // end onUpdateRowData
+
     public function onSearchCustomFilter($formField, &$db, $value)
     {
         $closure = $this->getClosure('onSearchCustomFilter');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $db, $value);
         }
-    } // end onSearchCustomFilter
-    
+    }
+
+    // end onSearchCustomFilter
+
     public function onGetCustomValue($formField, array &$row, &$postfix)
     {
         $closure = $this->getClosure('onGetCustomValue');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $row, $postfix);
         }
-    } // end onGetCustomValue
-    
+    }
+
+    // end onGetCustomValue
+
     public function onGetCustomEditInput($formField, array &$row)
     {
         $closure = $this->getClosure('onGetCustomEditInput');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $row);
         }
-    } // end onGetCustomEditInput
-        
+    }
+
+    // end onGetCustomEditInput
+
     public function onGetCustomListValue($formField, array &$row)
     {
         $closure = $this->getClosure('onGetCustomListValue');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $row);
         }
-    } // end onGetCustomListValue
-    
+    }
+
+    // end onGetCustomListValue
+
     public function onSelectCustomValue(&$db)
     {
         $closure = $this->getClosure('onSelectCustomValue');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($db);
         }
-    } // end onSelectCustomValue
-    
+    }
+
+    // end onSelectCustomValue
+
     public function onFileUpload($file)
     {
         $closure = $this->getClosure('onFileUpload');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($file);
         }
-    } // end onFileUpload
-    
+    }
+
+    // end onFileUpload
+
     public function onPhotoUpload($formField, $file)
     {
         $closure = $this->getClosure('onPhotoUpload');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($formField, $file);
         }
-    } // end onPhotoUpload
-    
+    }
+
+    // end onPhotoUpload
+
     public function onPhotoUploadFromWysiwyg($file)
     {
         $closure = $this->getClosure('onPhotoUploadFromWysiwyg');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($file);
         }
-    } // end onPhotoUploadFromWysiwyg
-    
-    
+    }
+
+    // end onPhotoUploadFromWysiwyg
+
     public function onInsertButtonFetch($def)
     {
         $closure = $this->getClosure('onInsertButtonFetch');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($def);
         }
-    } // end onInsertButtonFetch
-    
+    }
+
+    // end onInsertButtonFetch
+
     public function onUpdateButtonFetch($def)
     {
         $closure = $this->getClosure('onUpdateButtonFetch');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($def);
         }
-    } // end onUpdateButtonFetch
-    
+    }
+
+    // end onUpdateButtonFetch
+
     public function onDeleteButtonFetch($def)
     {
         $closure = $this->getClosure('onDeleteButtonFetch');
         if ($closure) {
             $closure = $closure->bindTo($this);
+
             return $closure($def);
         }
-    } // end onDeleteButtonFetch
+    }
+
+    // end onDeleteButtonFetch
 }

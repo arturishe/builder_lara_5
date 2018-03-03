@@ -1,90 +1,90 @@
 <?php
 
-return array(
-    'db' => array(
+return [
+    'db' => [
         'table' => 'roles',
-        'order' => array(
+        'order' => [
             'id' => 'ASC',
-        ),
-        'pagination' => array(
+        ],
+        'pagination' => [
             'per_page' => 20,
             'uri' => '/admin/handle/groups',
-        ),
-    ),
+        ],
+    ],
 
-    'options' => array(
-        'caption' => "Группы пользователей",
+    'options' => [
+        'caption' => 'Группы пользователей',
         'handler'    => 'Vis\Builder\Helpers\GroupsHandler',
         'model' => 'App\Models\Group',
-    ),
+    ],
 
-    'position' => array(
-        'tabs' => array(
-            'Общая'     => array(
+    'position' => [
+        'tabs' => [
+            'Общая'     => [
                 'id',
                 'slug',
                 'name',
-            ),
-            'Права доступа' => array(
+            ],
+            'Права доступа' => [
                 'permissions',
-            ),
-        )
-    ),
+            ],
+        ],
+    ],
 
-    'fields' => array(
-        'id' => array(
+    'fields' => [
+        'id' => [
             'caption' => '#',
             'type' => 'readonly',
             'class' => 'col-id',
             'width' => '1%',
             'hide' => true,
             'is_sorting' => false,
-        ),
-        'slug' => array(
-            'caption' => "Имя",
+        ],
+        'slug' => [
+            'caption' => 'Имя',
             'type' => 'text',
             'filter' => 'text',
             'is_sorting' => true,
-        ),
-        'name' => array(
-            'caption' => "Название",
+        ],
+        'name' => [
+            'caption' => 'Название',
             'type' => 'text',
             'filter' => 'text',
             'is_sorting' => false,
-        ),
-        'permissions' => array(
-            'caption' => "Доступы",
+        ],
+        'permissions' => [
+            'caption' => 'Доступы',
             'type' => 'text',
             'filter' => 'text',
             'is_sorting' => false,
             'hide_list' => true,
-            'permissions' => array(
+            'permissions' => [
                 'admin.access' => 'Доступ в админку',
-                'новости' => array(
+                'новости' => [
                     'admin.access_views' => 'Просмотр',
                     'admin.access_edit' => 'Редактирование',
                     'admin.access_delete' => 'Удаление',
-                )
-            )
-        ),
+                ],
+            ],
+        ],
 
-    ),
+    ],
 
-    'actions' => array(
-        'search' => array(
-            'caption' => "Поиск",
-        ),
-        'insert' => array(
-            'caption' => "Добавить",
-        ),
-        'update' => array(
+    'actions' => [
+        'search' => [
+            'caption' => 'Поиск',
+        ],
+        'insert' => [
+            'caption' => 'Добавить',
+        ],
+        'update' => [
             'caption' => 'Редактировать',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'delete' => array(
-            'caption' => "Удалить",
-        ),
-    ),
-);
+            },
+        ],
+        'delete' => [
+            'caption' => 'Удалить',
+        ],
+    ],
+];

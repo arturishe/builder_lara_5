@@ -1,14 +1,16 @@
-<?php namespace Vis\Builder;
+<?php
+
+namespace Vis\Builder;
 
 use Vis\Builder\Handlers\ViewHandler;
-use Vis\Builder\Handlers\RequestHandler;
 use Vis\Builder\Handlers\QueryHandler;
-use Vis\Builder\Handlers\ActionsHandler;
 use Vis\Builder\Handlers\ExportHandler;
 use Vis\Builder\Handlers\ImportHandler;
+use Vis\Builder\Handlers\ActionsHandler;
 use Vis\Builder\Handlers\ButtonsHandler;
-use Vis\Builder\Handlers\CustomClosureHandler;
+use Vis\Builder\Handlers\RequestHandler;
 use Vis\Builder\Handlers\DefinitionHandler;
+use Vis\Builder\Handlers\CustomClosureHandler;
 
 class JarboeController
 {
@@ -21,7 +23,7 @@ class JarboeController
     protected $callbacks;
     protected $fields;
     protected $groupFields;
-    protected $patterns = array();
+    protected $patterns = [];
 
     public $view;
     public $request;
@@ -43,13 +45,12 @@ class JarboeController
 
         $this->doPrepareDefinition();
 
-
         $this->handler = $this->createCustomHandlerInstance();
         if (isset($this->definition['callbacks'])) {
             $this->callbacks = new CustomClosureHandler($this->definition['callbacks'], $this);
         }
-        $this->fields  = $this->loadFields();
-        $this->groupFields  = $this->loadGroupFields();
+        $this->fields = $this->loadFields();
+        $this->groupFields = $this->loadGroupFields();
 
         $this->actions = new ActionsHandler($this->definition['actions'], $this);
 
@@ -62,10 +63,10 @@ class JarboeController
         }
 
         if (isset($this->definition['buttons'])) {
-            $this->buttons  = new ButtonsHandler($this->definition['buttons'], $this);
+            $this->buttons = new ButtonsHandler($this->definition['buttons'], $this);
         }
-        $this->query   = new QueryHandler($this);
-        $this->view    = new ViewHandler($this);
+        $this->query = new QueryHandler($this);
+        $this->view = new ViewHandler($this);
         $this->request = new RequestHandler($this);
 
         $this->currentID = request('id');
@@ -78,21 +79,23 @@ class JarboeController
 
     private function doPrepareDefinition()
     {
-        if (!isset($this->definition['export'])) {
-            $this->definition['export'] = array();
+        if (! isset($this->definition['export'])) {
+            $this->definition['export'] = [];
         }
-        if (!isset($this->definition['import'])) {
-            $this->definition['import'] = array();
-        }
-
-        if (!isset($this->definition['actions'])) {
-            $this->definition['actions'] = array();
+        if (! isset($this->definition['import'])) {
+            $this->definition['import'] = [];
         }
 
-        if (!isset($this->definition['db']['pagination']['uri'])) {
+        if (! isset($this->definition['actions'])) {
+            $this->definition['actions'] = [];
+        }
+
+        if (! isset($this->definition['db']['pagination']['uri'])) {
             $this->definition['db']['pagination']['uri'] = $this->options['url'];
         }
-    } // end doPrepareDefinition
+    }
+
+    // end doPrepareDefinition
 
     public function handle()
     {
@@ -104,45 +107,60 @@ class JarboeController
         }
 
         return $this->request->handle();
-    } // end handle
+    }
+
+    // end handle
 
     public function isAllowedID($id)
     {
         return in_array($id, $this->allowedIds);
-    } // end isAllowedID
+    }
+
+    // end isAllowedID
 
     protected function getPreparedOptions($opt)
     {
         $options = $opt;
-        $options['def_path'] = app_path(). $opt['def_path'];
+        $options['def_path'] = app_path().$opt['def_path'];
 
         return $options;
-    } // end getPreparedOptions
+    }
+
+    // end getPreparedOptions
 
     protected function createCustomHandlerInstance()
     {
         if (isset($this->definition['options']['handler'])) {
-            $handler = '\\'. $this->definition['options']['handler'];
+            $handler = '\\'.$this->definition['options']['handler'];
+
             return new $handler($this);
         }
 
         return false;
-    } // end createCustomHandlerInstance
+    }
+
+    // end createCustomHandlerInstance
 
     public function hasCustomHandlerMethod($methodName)
     {
-        return $this->getCustomHandler() && is_callable(array($this->getCustomHandler(), $methodName));
-    } // end hasCustomHandlerMethod
+        return $this->getCustomHandler() && is_callable([$this->getCustomHandler(), $methodName]);
+    }
+
+    // end hasCustomHandlerMethod
 
     public function isSetDefinitionCallback($methodName)
     {
         //
-    } // end isSetDefinitionCallback
+    }
+
+    // end isSetDefinitionCallback
 
     public function getCustomHandler()
     {
-        return $this->handler ? : $this->callbacks;
-    } // end getCustomHandler
+        return $this->handler ?: $this->callbacks;
+    }
+
+    // end getCustomHandler
 
     public function getField($ident)
     {
@@ -155,12 +173,16 @@ class JarboeController
         }
 
         throw new \RuntimeException("Field [{$ident}] does not exist for current scheme.");
-    } // end getField
+    }
+
+    // end getField
 
     public function getFields()
     {
         return $this->fields;
-    } // end getFields
+    }
+
+    // end getFields
 
     public function getOption($ident)
     {
@@ -169,18 +191,20 @@ class JarboeController
         }
 
         throw new \RuntimeException("Undefined option [{$ident}].");
-    } // end getOption
+    }
+
+    // end getOption
 
     public function getDefinitionName()
     {
-        $definition = explode ('.', $this->getOption('def_name'));
+        $definition = explode('.', $this->getOption('def_name'));
 
         return $definition[0];
     }
 
     public function getUrlAction()
     {
-        return '/admin/handle/' . $this->getDefinitionName();
+        return '/admin/handle/'.$this->getDefinitionName();
     }
 
     public function getAdditionalOptions()
@@ -189,19 +213,23 @@ class JarboeController
             return $this->options['additional'];
         }
 
-        return array();
-    } // end getAdditionalOptions
+        return [];
+    }
+
+    // end getAdditionalOptions
 
     public function getDefinition()
     {
         return $this->definition;
-    } // end getDefinition
+    }
+
+    // end getDefinition
 
     protected function loadFields()
     {
         $definition = $this->getDefinition();
 
-        $fields = array();
+        $fields = [];
         foreach ($definition['fields'] as $name => $info) {
             if ($this->isPatternField($name)) {
                 $this->patterns[$name] = $this->createPatternInstance($name, $info);
@@ -211,16 +239,18 @@ class JarboeController
         }
 
         return $fields;
-    } // end loadFields
+    }
+
+    // end loadFields
 
     protected function loadGroupFields()
     {
         $definition = $this->getDefinition();
-        $fields = array();
+        $fields = [];
         foreach ($definition['fields'] as $name => $info) {
-            if ($info['type'] == "group" && count($info['filds'])) {
+            if ($info['type'] == 'group' && count($info['filds'])) {
                 foreach ($info['filds'] as $nameGroup => $infoGroup) {
-                    $fields[$nameGroup] =  $this->createFieldInstance($nameGroup, $infoGroup);
+                    $fields[$nameGroup] = $this->createFieldInstance($nameGroup, $infoGroup);
                 }
             }
         }
@@ -231,12 +261,16 @@ class JarboeController
     public function getPatterns()
     {
         return $this->patterns;
-    } // end getPatterns
+    }
+
+    // end getPatterns
 
     public function isPatternField($name)
     {
         return preg_match('~^pattern\.~', $name);
-    } // end isPatternField
+    }
+
+    // end isPatternField
 
     protected function createPatternInstance($name, $info)
     {
@@ -247,11 +281,13 @@ class JarboeController
             $this->getDefinition(),
             $this->getCustomHandler()
         );
-    } // end createPatternInstance
+    }
+
+    // end createPatternInstance
 
     protected function createFieldInstance($name, $info)
     {
-        $className = 'Vis\\Builder\\Fields\\'. ucfirst(camel_case($info['type'])) ."Field";
+        $className = 'Vis\\Builder\\Fields\\'.ucfirst(camel_case($info['type'])).'Field';
 
         return new $className(
             $name,
@@ -260,28 +296,32 @@ class JarboeController
             $this->getDefinition(),
             $this->getCustomHandler()
         );
-    } // end createFieldInstance
+    }
+
+    // end createFieldInstance
 
     protected function getTableDefinition($table)
     {
         $table = preg_replace('~\.~', '/', $table);
-        $path = config_path() .'/builder/tb-definitions/'. $table .'.php';
+        $path = config_path().'/builder/tb-definitions/'.$table.'.php';
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             throw new \RuntimeException("Definition \n[{$path}]\n does not exist.");
         }
 
-        $definition = require($path);
+        $definition = require $path;
 
-        if (!$definition) {
-            throw new \RuntimeException("Empty definition?");
+        if (! $definition) {
+            throw new \RuntimeException('Empty definition?');
         }
 
         $definition['is_searchable'] = $this->isSearchable($definition);
         $definition['options']['admin_uri'] = \Config::get('builder.admin.uri');
 
         return $definition;
-    } // end getTableDefinition
+    }
+
+    // end getTableDefinition
 
     private function isSearchable($definition)
     {
@@ -299,15 +339,15 @@ class JarboeController
 
     public function getFiltersDefinition()
     {
-       $defName = $this->getOption('def_name');
+        $defName = $this->getOption('def_name');
 
-       return session('table_builder.' . $defName . '.filters', array());
+        return session('table_builder.'.$defName.'.filters', []);
     }
 
     public function getOrderDefinition()
     {
         $defName = $this->getOption('def_name');
 
-        return session('table_builder.' . $defName . '.order', array());
+        return session('table_builder.'.$defName.'.order', []);
     }
 }

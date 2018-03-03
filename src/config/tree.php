@@ -1,98 +1,98 @@
 <?php
 
-return array(
+return [
 
     'model' => 'App\Models\Tree',
-    'cache' => array(
-        'tags' => array('tree'),
-    ),
-    'templates' => array(
-        'contacts' => array(
+    'cache' => [
+        'tags' => ['tree'],
+    ],
+    'templates' => [
+        'contacts' => [
             'action' => 'ContactsController@showPage',
             'node_definition' => 'contacts',
-            'check' => function() {
+            'check' => function () {
                 return true;
             },
             'title' => 'Контакты',
             //'show_templates' => ['news', 'about']
-        ),
-        'news' => array(
+        ],
+        'news' => [
             'action' => 'NewsController@showPages',
             'node_definition' => 'node',
-            'check' => function() {
+            'check' => function () {
                 return true;
             },
-            'title' => 'Новости'
-        ),
+            'title' => 'Новости',
+        ],
 
-        'about' => array(
+        'about' => [
             'action' => 'AboutController@showPage',
             'node_definition' => 'node',
-            'check' => function() {
+            'check' => function () {
                 return true;
             },
-            'title' => "О нас"
-        ),
+            'title' => 'О нас',
+        ],
 
-        'article' => array(
+        'article' => [
             'action' => 'ArticleController@showPage',
             'node_definition' => 'node',
-            'check' => function() {
+            'check' => function () {
                 return true;
             },
-            'title' => "Статья"
-        ),
+            'title' => 'Статья',
+        ],
 
-        'main' => array(
+        'main' => [
             'action' => 'HomeController@showPage',
             'node_definition' => 'node',
-            'check' => function() {
+            'check' => function () {
                 return true;
             },
-            'title' => "Главная"
-        ),
+            'title' => 'Главная',
+        ],
 
-    ),
+    ],
 
-    'default' => array(
+    'default' => [
         'type' => 'node',
         'action' => 'HomeController@showPage',
         'node_definition' => 'node',
-    ),
+    ],
 
-    'actions' => array(
+    'actions' => [
 
-        'update' => array(
+        'update' => [
             'caption' => 'Редактировать',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'preview' => array(
+            },
+        ],
+        'preview' => [
             'caption' => 'Предпросмотр',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'clone' => array(
+            },
+        ],
+        'clone' => [
             'caption' => 'Клонировать',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
+            },
+        ],
 
-        'revisions' => array(
+        'revisions' => [
             'caption' => 'Версии',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'delete' => array(
+            },
+        ],
+        'delete' => [
             'caption' => 'Удалить',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-    ),
+            },
+        ],
+    ],
 
-);
+];

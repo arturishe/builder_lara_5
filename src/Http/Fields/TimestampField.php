@@ -7,48 +7,53 @@ use Illuminate\Support\Facades\Session;
 
 class TimestampField extends AbstractField
 {
-
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
         if ($this->getAttribute('is_range')) {
-            if (!isset($value['from']) && !isset($value['to'])) {
+            if (! isset($value['from']) && ! isset($value['to'])) {
                 return;
             }
-            
+
             $dateFrom = isset($value['from']) ? $this->getTimestamp($value['from']) : '28800';
             $dateTo = isset($value['to']) ? $this->getTimestamp($value['to']) : '2146939932';
             $db->whereBetween(
-                $table .'.'. $this->getFieldName(),
-                array(
+                $table.'.'.$this->getFieldName(),
+                [
                     date('Y-m-d H:i:s', $dateFrom),
-                    date('Y-m-d H:i:s', $dateTo)
-                )
+                    date('Y-m-d H:i:s', $dateTo),
+                ]
             );
         } else {
             $db->where(
-                $table .'.'. $this->getFieldName(),
+                $table.'.'.$this->getFieldName(),
                 date('Y-m-d H:i:s', $this->getTimestamp($value))
             );
         }
-    } // end onSearchFilter
-    
+    }
+
+    // end onSearchFilter
+
     public function prepareQueryValue($value)
     {
-        if (!$value) {
+        if (! $value) {
             if ($this->getAttribute('is_null')) {
-                return null;
+                return;
             }
         }
 
-        return date('Y-m-d H:i:s', $this->getTimestamp($value)) . '.000000';
-    } // end prepareQueryValue
-    
+        return date('Y-m-d H:i:s', $this->getTimestamp($value)).'.000000';
+    }
+
+    // end prepareQueryValue
+
     private function getTimestamp($date)
     {
         return strtotime(str_replace('/', '-', $date));
-    } // end getTimestamp
-    
+    }
+
+    // end getTimestamp
+
     public function getListValue($row)
     {
         if ($this->hasCustomHandlerMethod('onGetListValue')) {
@@ -57,15 +62,17 @@ class TimestampField extends AbstractField
                 return $res;
             }
         }
-        
-        if (!$this->getValue($row)) {
+
+        if (! $this->getValue($row)) {
             return '';
         }
 
         return date('d/m/Y', $this->getTimestamp($this->getValue($row)));
-    } // end getListValue
+    }
 
-    public function getEditInput($row = array())
+    // end getListValue
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -78,21 +85,22 @@ class TimestampField extends AbstractField
         $value = $value ? date('d/m/Y', $this->getTimestamp($value)) : '';
 
         $input = View::make('admin::tb.input_timestamp');
-        $input->value  = $value;
-        $input->name   = $this->getFieldName();
+        $input->value = $value;
+        $input->name = $this->getFieldName();
         $input->months = $this->getAttribute('months');
         $input->prefix = $row ? 'e-' : 'c-';
 
         return $input->render();
-    } // end getEditInput
-    
-    
+    }
+
+    // end getEditInput
+
     public function getFilterInput()
     {
-        if (!$this->getAttribute('filter')) {
+        if (! $this->getAttribute('filter')) {
             return '';
         }
-        
+
         if ($this->getAttribute('is_range')) {
             return $this->getFilterRangeInput();
         }
@@ -106,13 +114,15 @@ class TimestampField extends AbstractField
         $input->value = $filter;
 
         return $input->render();
-    } // end getFilterInput
-    
+    }
+
+    // end getFilterInput
+
     private function getFilterRangeInput()
     {
         $definitionName = $this->getOption('def_name');
         $sessionPath = 'table_builder.'.$definitionName.'.filters.'.$this->getFieldName();
-        $filter = Session::get($sessionPath, array());
+        $filter = Session::get($sessionPath, []);
 
         $input = View::make('admin::tb.filter_timestamp_range');
         $input->name = $this->getFieldName();
@@ -121,5 +131,7 @@ class TimestampField extends AbstractField
         $input->months = $this->getAttribute('months');
 
         return $input->render();
-    } // end getFilterRangeInput
+    }
+
+    // end getFilterRangeInput
 }

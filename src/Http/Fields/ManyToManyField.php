@@ -2,16 +2,17 @@
 
 namespace Vis\Builder\Fields;
 
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 
 class ManyToManyField extends AbstractField
 {
-
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function onSearchFilter(&$db, $value)
     {
@@ -24,14 +25,15 @@ class ManyToManyField extends AbstractField
             $mtmExternalValueField = $this->getAttribute('mtm_external_value_field');
 
             $searchResult = DB::table($mtmTable)
-                ->leftJoin($mtmExternalTable, $mtmExternalTable. '.'. $mtmExternalForeignKeyField , '=', $mtmTable . '.' . $mtmExternalKeyField)
-                ->where($mtmExternalValueField, 'like', '%' . $value . '%')
+                ->leftJoin($mtmExternalTable, $mtmExternalTable.'.'.$mtmExternalForeignKeyField, '=', $mtmTable.'.'.$mtmExternalKeyField)
+                ->where($mtmExternalValueField, 'like', '%'.$value.'%')
                 ->select($mtmKeyField)->pluck($mtmKeyField);
 
             $db->whereIn($this->definition['db']['table'].'.id', $searchResult);
         }
+    }
 
-    } // end onSearchFilter
+    // end onSearchFilter
 
     public function onPrepareRowValues($values, $id)
     {
@@ -47,15 +49,15 @@ class ManyToManyField extends AbstractField
 
         $delete->delete();
 
-        $data = array();
+        $data = [];
         if ($this->getAttribute('show_type') == 'extra') {
             foreach ($values as $info) {
-                $temp = array(
+                $temp = [
                     $this->getAttribute('mtm_key_field')          => $id,
                     $this->getAttribute('mtm_external_key_field') => $info['id'],
-                );
+                ];
 
-                $extraFields = $this->getAttribute('extra_fields', array());
+                $extraFields = $this->getAttribute('extra_fields', []);
                 foreach ($extraFields as $fieldName => $fieldInfo) {
                     $temp[$fieldName] = $info[$fieldName];
                 }
@@ -68,10 +70,10 @@ class ManyToManyField extends AbstractField
             $isInValueElement = ($this->getAttribute('show_type', 'checkbox') == 'select2' || $this->getAttribute('show_type', 'checkbox') == 'select3' || $this->getAttribute('show_type', 'checkbox') == 'select_tree');
             foreach ($values as $key => $val) {
                 $externalID = $isInValueElement ? $val : $key;
-                $data[$key] = array(
+                $data[$key] = [
                     $this->getAttribute('mtm_key_field')          => $id,
-                    $this->getAttribute('mtm_external_key_field') => $externalID
-                );
+                    $this->getAttribute('mtm_external_key_field') => $externalID,
+                ];
 
                 if ($this->getAttribute('mtm_external_model')) {
                     $data[$key][$this->getAttribute('mtm_external_model')] = $this->definition['options']['model'];
@@ -82,12 +84,16 @@ class ManyToManyField extends AbstractField
         if ($data) {
             DB::table($this->getAttribute('mtm_table'))->insert($data);
         }
-    } // end onPrepareRowValues
+    }
+
+    // end onPrepareRowValues
 
     public function onSelectValue(&$db)
     {
         // HACK: we dont need this method to be called for many2many field
-    } // end onSelectValue
+    }
+
+    // end onSelectValue
 
     public function getValue($row, $postfix = '')
     {
@@ -105,11 +111,13 @@ class ManyToManyField extends AbstractField
         $extKeyField = $this->getAttribute('mtm_external_foreign_key_field');
         $extValueField = $this->getAttribute('mtm_external_value_field');
         $value = DB::table($assocTable)
-            ->join($extTable, $assocTable . '.' . $assocExtKeyField, '=', $extTable . '.' . $extKeyField)
-            ->where($assocTable . '.' . $assocKeyField, $row['id'])->value($extValueField);
+            ->join($extTable, $assocTable.'.'.$assocExtKeyField, '=', $extTable.'.'.$extKeyField)
+            ->where($assocTable.'.'.$assocKeyField, $row['id'])->value($extValueField);
 
         return $value;
-    } // end getValue
+    }
+
+    // end getValue
 
     public function getListValue($row)
     {
@@ -121,9 +129,11 @@ class ManyToManyField extends AbstractField
         }
 
         return implode(', ', $this->getRelatedExternalFieldOptions($row));
-    } // end getListValue
+    }
 
-    public function getEditInput($row = array())
+    // end getListValue
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -141,17 +151,17 @@ class ManyToManyField extends AbstractField
             return $this->getEditInputSelectWithAjaxSearch($row);
         }
 
-        $input = View::make('admin::tb.input_many2many_'. $showType);
-        $input->selected = array();
+        $input = View::make('admin::tb.input_many2many_'.$showType);
+        $input->selected = [];
         if ($row) {
             $input->selected = $this->getRelatedExternalFieldOptions($row);
         }
 
-        $input->link    = $this->getAttribute('with_link');
-        $input->name    = $this->getFieldName();
-        $input->divide  = $this->getAttribute('divide_columns', 2);
+        $input->link = $this->getAttribute('with_link');
+        $input->name = $this->getFieldName();
+        $input->divide = $this->getAttribute('divide_columns', 2);
 
-        if ($showType == "select_tree") {
+        if ($showType == 'select_tree') {
             $input->options = $this->getFieldOptionForTree();
         } else {
             $input->options = $this->doDivideOnParts(
@@ -161,77 +171,85 @@ class ManyToManyField extends AbstractField
         }
 
         return $input->render();
-    } // end getEditInput
+    }
+
+    // end getEditInput
 
     private function getEditInputSelectWithAjaxSearch($row)
     {
         $input = View::make('admin::tb.input_many2many_select2_search');
 
-        $data = array();
+        $data = [];
         if ($row) {
             $selected = $this->getRelatedExternalFieldOptions($row);
             foreach ($selected as $id => $title) {
-                $data[] = array(
+                $data[] = [
                     'id'   => $id,
                     'name' => $title,
-                );
+                ];
             }
         }
         $input->selected = json_encode($data);
 
-        $input->postfix  = $row ? '_e' : '_c';
-        $input->link    = $this->getAttribute('with_link');
-        $input->name    = $this->getFieldName();
-        $input->search  = $this->getAttribute('select2_search');
+        $input->postfix = $row ? '_e' : '_c';
+        $input->link = $this->getAttribute('with_link');
+        $input->name = $this->getFieldName();
+        $input->search = $this->getAttribute('select2_search');
         $input->row = $row;
-        $input->insert   = $this->getAttribute('insert');
-        $input->attributes = json_encode ($this->attributes);
+        $input->insert = $this->getAttribute('insert');
+        $input->attributes = json_encode($this->attributes);
 
         return $input->render();
-    } // end getEditInputSelectWithAjaxSearch
+    }
+
+    // end getEditInputSelectWithAjaxSearch
 
     private function getEditInputWithExtra($row)
     {
         $input = View::make('admin::tb.input_many2many_extra');
 
-        $input->selected = array();
+        $input->selected = [];
         if ($row) {
             $input->selected = $this->getRelatedExternalFieldOptions($row, true);
         }
 
         $input->postfix = $row ? '_e' : '_c';
-        $input->name    = $this->getFieldName();
+        $input->name = $this->getFieldName();
         $input->options = $this->getAllExternalFieldOptions(true);
-        $input->extra   = $this->getAttribute('extra_fields');
+        $input->extra = $this->getAttribute('extra_fields');
 
         return $input->render();
-    } // end getEditInputWithExtra
+    }
+
+    // end getEditInputWithExtra
 
     private function doDivideOnParts($array, $segmentCount)
     {
         $dataCount = count($array);
         if ($dataCount === 0) {
             // HACK: when there is no many2many options
-            return array(array());
+            return [[]];
         }
 
         $segmentLimit = ceil($dataCount / $segmentCount);
-        $outputArray  = array_chunk($array, $segmentLimit, true);
+        $outputArray = array_chunk($array, $segmentLimit, true);
 
         return $outputArray;
-    } // end doDivideOnParts
+    }
+
+    // end doDivideOnParts
 
     protected function getRelatedExternalFieldOptions($row, $isGetAll = false)
     {
-        $keyField = $this->getAttribute('mtm_table') .'.'. $this->getAttribute('mtm_external_key_field');
-        $valueField = $this->getAttribute('mtm_external_table') .'.'. $this->getAttribute('mtm_external_value_field');
+        $keyField = $this->getAttribute('mtm_table').'.'.$this->getAttribute('mtm_external_key_field');
+        $valueField = $this->getAttribute('mtm_external_table').'.'.$this->getAttribute('mtm_external_value_field');
         $externalTable = $this->getAttribute('mtm_external_table');
-        $externalForeignKey = $externalTable .'.'. $this->getAttribute('mtm_external_foreign_key_field');
+        $externalForeignKey = $externalTable.'.'.$this->getAttribute('mtm_external_foreign_key_field');
 
         $options = DB::table($this->getAttribute('mtm_table'));
         $options->select($keyField, $valueField);
         if ($isGetAll) {
-            $options->addSelect($this->getAttribute('mtm_table') .'.*');
+            $options->addSelect($this->getAttribute('mtm_table').'.*');
         }
 
         $options->join($externalTable, $keyField, '=', $externalForeignKey);
@@ -259,39 +277,41 @@ class ManyToManyField extends AbstractField
                 }
             }
         }
-        if ($this->getAttribute('show_type') == "select3") {
-            $res = $options->orderBy($this->getAttribute('mtm_table').".id", "asc")->get();
+        if ($this->getAttribute('show_type') == 'select3') {
+            $res = $options->orderBy($this->getAttribute('mtm_table').'.id', 'asc')->get();
         } else {
             $res = $options->get();
         }
 
-        $options = array();
+        $options = [];
         foreach ($res as $opt) {
             $opt = (array) $opt;
             $id = $opt[$this->getAttribute('mtm_external_key_field')];
             $value = $opt[$this->getAttribute('mtm_external_value_field')];
 
             if ($isGetAll) {
-                $options[$id] = array(
+                $options[$id] = [
                     'value' => $value,
-                    'info'  => $opt
-                );
+                    'info'  => $opt,
+                ];
             } else {
                 $options[$id] = $value;
             }
         }
 
         return $options;
-    } // end getRelatedExternalFieldOptions
+    }
+
+    // end getRelatedExternalFieldOptions
 
     protected function getAllExternalFieldOptions($isGetAll = false)
     {
-        $valueField = $this->getAttribute('mtm_external_table') .'.'. $this->getAttribute('mtm_external_value_field');
+        $valueField = $this->getAttribute('mtm_external_table').'.'.$this->getAttribute('mtm_external_value_field');
         $externalTable = $this->getAttribute('mtm_external_table');
-        $externalForeignKey = $externalTable .'.'. $this->getAttribute('mtm_external_foreign_key_field');
+        $externalForeignKey = $externalTable.'.'.$this->getAttribute('mtm_external_foreign_key_field');
 
         $options = DB::table($externalTable);
-        if (!$isGetAll) {
+        if (! $isGetAll) {
             $options->select($externalForeignKey, $valueField);
         }
 
@@ -305,31 +325,32 @@ class ManyToManyField extends AbstractField
         $this->externalTableOrder($options);
 
         $res = $options->get();
-        $options = array();
+        $options = [];
         foreach ($res as $opt) {
             $opt = (array) $opt;
             $id = $opt[$this->getAttribute('mtm_external_foreign_key_field')];
             $value = $opt[$this->getAttribute('mtm_external_value_field')];
 
             if ($isGetAll) {
-                $options[$id] = array(
+                $options[$id] = [
                     'value' => $value,
-                    'info'  => $opt
-                );
+                    'info'  => $opt,
+                ];
             } else {
                 $options[$id] = $value;
             }
         }
 
         return $options;
-    } // end getAllExternalFieldOptions
+    }
 
+    // end getAllExternalFieldOptions
 
     public function getFieldOptionForTree()
     {
         $params = $this->getAttribute('type_tree_params');
         $model = $params['model'];
-        $options = $model::where("parent_id", $params['start_id_folder']);
+        $options = $model::where('parent_id', $params['start_id_folder']);
 
         $additionalWheres = $this->getAttribute('additional_where');
         if ($additionalWheres) {
@@ -337,7 +358,7 @@ class ManyToManyField extends AbstractField
                 $options->where($key, $opt['sign'], $opt['value']);
             }
         }
-        $res = $options->orderBy("parent_id")->get();
+        $res = $options->orderBy('parent_id')->get();
 
         return $res;
     }
@@ -353,7 +374,7 @@ class ManyToManyField extends AbstractField
 
         $results = DB::table($this->getAttribute('mtm_external_table'))
             ->select('id', $this->getAttribute('mtm_external_value_field'))
-            ->where($this->getAttribute('mtm_external_value_field'), 'LIKE', '%'. $query .'%')
+            ->where($this->getAttribute('mtm_external_value_field'), 'LIKE', '%'.$query.'%')
             ->take($limit)
             ->skip(($limit * $page) - $limit);
 
@@ -366,24 +387,26 @@ class ManyToManyField extends AbstractField
         $this->externalTableOrder($results);
 
         $results = $results->get();
-        $results = $results ? : array();
+        $results = $results ?: [];
 
-        $res = array();
+        $res = [];
 
         foreach ($results as $result) {
             $result = (array) $result;
-            $res[] = array(
+            $res[] = [
                 'id'   => $result['id'],
                 'name' => $result[$this->getAttribute('mtm_external_value_field')],
-            );
+            ];
         }
 
-        return array(
+        return [
             'results' => $res,
-            'more'    => $res && !empty($res),
-            'message' => ''
-        );
-    } // end getAjaxSearchResult
+            'more'    => $res && ! empty($res),
+            'message' => '',
+        ];
+    }
+
+    // end getAjaxSearchResult
 
     private function externalTableOrder(&$options)
     {
@@ -393,5 +416,4 @@ class ManyToManyField extends AbstractField
             }
         }
     }
-
 }

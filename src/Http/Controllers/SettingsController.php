@@ -1,10 +1,12 @@
-<?php namespace Vis\Builder;
+<?php
+
+namespace Vis\Builder;
 
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Response;
 
 class SettingsController extends Controller
@@ -14,32 +16,34 @@ class SettingsController extends Controller
     */
     public function fetchIndex()
     {
-        $breadcrumb[Config::get('builder.settings.title_page')] = "";
+        $breadcrumb[Config::get('builder.settings.title_page')] = '';
         $groupsSettings = Config::get('builder.settings.groups');
 
-        $allpage = Setting::orderBy('id', "desc");
+        $allpage = Setting::orderBy('id', 'desc');
         $title = Config::get('builder.settings.title_page');
 
         //filter group
-        if (Input::get("group")) {
-            $allpage = $allpage -> where("group_type", Input::get("group"));
-            $title .= " / ". $groupsSettings[Input::get("group")];
+        if (Input::get('group')) {
+            $allpage = $allpage->where('group_type', Input::get('group'));
+            $title .= ' / '.$groupsSettings[Input::get('group')];
         }
 
-        $allpage = $allpage -> paginate(20);
+        $allpage = $allpage->paginate(20);
         $groups = Config::get('builder.settings.groups');
 
-        $view = "settings.settings_all";
+        $view = 'settings.settings_all';
         if (Request::ajax()) {
-            $view = "settings.part.settings_center";
+            $view = 'settings.part.settings_center';
         }
 
         return View::make('admin::'.$view)
             ->with('title', $title)
             ->with('breadcrumb', $breadcrumb)
-            ->with("data", $allpage)
-            ->with("groups", $groups);
-    } // end fetchIndex
+            ->with('data', $allpage)
+            ->with('groups', $groups);
+    }
+
+    // end fetchIndex
 
     /*
     * Создания настройки
@@ -50,9 +54,11 @@ class SettingsController extends Controller
         $groups = Config::get('builder.settings.groups');
 
         return View::make('admin::settings.part.form_settings')
-            ->with("type", $types)
-            ->with("groups", $groups);
-    } // end fetchCreate
+            ->with('type', $types)
+            ->with('groups', $groups);
+    }
+
+    // end fetchCreate
 
     /*
    * Сохранение настройки
@@ -69,31 +75,33 @@ class SettingsController extends Controller
 
         Setting::doSaveSetting($data, $file);
 
-        if ($data["id"] != 0 && is_numeric($data["id"])) {
-            $ok_messages = "Запись успешно обновлена";
+        if ($data['id'] != 0 && is_numeric($data['id'])) {
+            $ok_messages = 'Запись успешно обновлена';
         } else {
-            $ok_messages = "Запись успешно добавлена";
+            $ok_messages = 'Запись успешно добавлена';
         }
 
         return Response::json(
-            array(
+            [
                 'status'            => 'ok',
-                "ok_messages"       => $ok_messages,
-            )
+                'ok_messages'       => $ok_messages,
+            ]
         );
-    }  // end doSave
+    }
+
+    // end doSave
 
     /*
     * Удаление настройки
     */
     public function doDeleteSetting()
     {
-        Setting::doDelete(Input::get("id"));
+        Setting::doDelete(Input::get('id'));
 
         return Response::json(
-            array(
-                'status' => 'ok'
-            )
+            [
+                'status' => 'ok',
+            ]
         );
     }
 
@@ -102,51 +110,55 @@ class SettingsController extends Controller
     */
     public function fetchEdit()
     {
-        $id = Input::get("id");
+        $id = Input::get('id');
         if (is_numeric($id)) {
             $page = Setting::findOrFail($id);
             $type = Config::get('builder.settings.type');
             $groups = Config::get('builder.settings.groups');
 
-            $select_info = array();
-            if ($page->type == 2 || $page->type == 3  || $page->type == 5) {
-                $select_info = SettingSelect::where("id_setting", $page->id)
-                    -> orderBy("priority")
-                    -> get()
+            $select_info = [];
+            if ($page->type == 2 || $page->type == 3 || $page->type == 5) {
+                $select_info = SettingSelect::where('id_setting', $page->id)
+                    ->orderBy('priority')
+                    ->get()
                     ->toArray();
             }
 
             return View::make('admin::settings.part.form_settings')
                 ->with('info', $page)
-                ->with("type", $type)
-                ->with("select_info", $select_info)
-                ->with("groups", $groups);
+                ->with('type', $type)
+                ->with('select_info', $select_info)
+                ->with('groups', $groups);
         }
-    } // end fetchEdit
+    }
+
+    // end fetchEdit
 
     /*
     * Deleting item select
     */
     public function doDeleteSettingSelect()
     {
-        SettingSelect::doDelete(Input::get("id"));
+        SettingSelect::doDelete(Input::get('id'));
 
         return Response::json(
-            array(
+            [
                 'status' => 'ok',
-                "text" => "Запись успешно удалена"
-            )
+                'text' => 'Запись успешно удалена',
+            ]
         );
-    } //end doSettingSelectDelete
+    }
+
+    //end doSettingSelectDelete
 
     public function doFastSave()
     {
         if (Input::has('id') && Input::has('value')) {
-           $setting = Setting::find(Input::get('id'));
-           $setting->value = trim(Input::get('value'));
-           $setting->save();
+            $setting = Setting::find(Input::get('id'));
+            $setting->value = trim(Input::get('value'));
+            $setting->save();
 
-           Setting::reCacheSettings();
+            Setting::reCacheSettings();
         }
     }
 }

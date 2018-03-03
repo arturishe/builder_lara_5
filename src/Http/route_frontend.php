@@ -1,19 +1,19 @@
 <?php
-$arrSegments = explode("/", Request::path());
 
-if ($arrSegments[0] != "admin") {
+$arrSegments = explode('/', Request::path());
+
+if ($arrSegments[0] != 'admin') {
     try {
         $_model = Config::get('builder.tree.model');
         if ($_model) {
             $slug = end($arrSegments);
 
-            if (!$slug || $slug == LaravelLocalization::setLocale()) {
-                $slug = "/";
+            if (! $slug || $slug == LaravelLocalization::setLocale()) {
+                $slug = '/';
             }
 
-            $nodes = $_model::where("slug", 'like', $slug)->get();
+            $nodes = $_model::where('slug', 'like', $slug)->get();
             foreach ($nodes as $node) {
-
                 if ($node->getUrl() == Request::url()) {
                     break;
                 }
@@ -21,7 +21,7 @@ if ($arrSegments[0] != "admin") {
 
             if (isset($node->id)) {
                 $slugTree = $slug;
-                $_nodeUrl = trim($node->getUrlNoLocation(), "/");
+                $_nodeUrl = trim($node->getUrlNoLocation(), '/');
 
                 Route::group(
                     ['middleware' => ['web']],
@@ -31,7 +31,7 @@ if ($arrSegments[0] != "admin") {
                             function () {
                                 Route::get('{slug?}', [
                                     'as' => 'route_admin',
-                                    'uses' => 'Vis\Builder\TableAdminController@showPageUrlTree'
+                                    'uses' => 'Vis\Builder\TableAdminController@showPageUrlTree',
                                 ])->where('slug', '.+');
                             }
                         );
@@ -42,9 +42,9 @@ if ($arrSegments[0] != "admin") {
     } catch (Exception $e) {
     }
 
-/*
- * other tree
- */
+    /*
+     * other tree
+     */
     $otherTreeUrl = Config::get('builder.tree.other_tree_url');
 
     if ($otherTreeUrl && is_array($otherTreeUrl)) {
@@ -54,7 +54,7 @@ if ($arrSegments[0] != "admin") {
             if (isset($arrSegments[1])) {
                 $startUrl = $arrSegments[1];
             } else {
-                $startUrl = "/";
+                $startUrl = '/';
             }
         }
 
@@ -64,29 +64,27 @@ if ($arrSegments[0] != "admin") {
             if (isset($otherTreeUrl[$startUrl])) {
                 $configName = $otherTreeUrl[$startUrl];
 
-                $definition = Config::get('builder.' . $configName);
+                $definition = Config::get('builder.'.$configName);
                 $model = $definition['model'];
 
                 $slug = end($arrSegments);
 
-                if (!isset($slugTree)) {
-                    $nodes = $model::where("slug", 'like', $slug)->get();
+                if (! isset($slugTree)) {
+                    $nodes = $model::where('slug', 'like', $slug)->get();
 
                     foreach ($nodes as $node) {
-
                         if ($node->getUrl() == Request::url()) {
                             break;
                         }
                     }
-
 
                     if (isset($node->id)) {
                         $_nodeUrl = $node->getUrlNoLocation();
                         $templates = $definition['templates'];
 
                         $middleware = ['web'];
-                        if (isset($templates[$node->template]['middleware']) && !empty($templates[$node->template]['middleware'])) {
-                            foreach ((array)$templates[$node->template]['middleware'] as $midWare) {
+                        if (isset($templates[$node->template]['middleware']) && ! empty($templates[$node->template]['middleware'])) {
+                            foreach ((array) $templates[$node->template]['middleware'] as $midWare) {
                                 $middleware[] = $midWare;
                             }
                         }
@@ -95,22 +93,21 @@ if ($arrSegments[0] != "admin") {
                             ['middleware' => $middleware],
                             function () use ($node, $_nodeUrl, $templates) {
                                 Route::group(
-                                    array('prefix' => LaravelLocalization::setLocale()),
+                                    ['prefix' => LaravelLocalization::setLocale()],
                                     function () use ($node, $_nodeUrl, $templates) {
                                         Route::get(
                                             $_nodeUrl,
                                             function () use ($node, $templates) {
-                                    
-                                                if (!isset($templates[$node->template])) {
+                                                if (! isset($templates[$node->template])) {
                                                     App::abort(404);
                                                 }
 
                                                 list($controller, $method) = explode('@', $templates[$node->template]['action']);
 
                                                 $app = app();
-                                                $controller = $app->make("App\\Http\\Controllers\\" . $controller);
+                                                $controller = $app->make('App\\Http\\Controllers\\'.$controller);
 
-                                                return $controller->callAction('init', array($node, $method));
+                                                return $controller->callAction('init', [$node, $method]);
                                             }
                                         );
                                     }

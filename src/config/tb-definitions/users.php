@@ -1,24 +1,24 @@
 <?php
 
-return array(
-    'db' => array(
+return [
+    'db' => [
         'table' => 'users',
-        'order' => array(
+        'order' => [
             'created_at' => 'DESC',
-        ),
-        'pagination' => array(
+        ],
+        'pagination' => [
             'per_page' => 20,
             'uri' => '/admin/users',
-        ),
-    ),
-    'options' => array(
+        ],
+    ],
+    'options' => [
         'caption' => 'Пользователи',
         'handler'    => 'Vis\Builder\Helpers\UsersHandler',
         'model' => 'App\Models\User',
-    ),
-    'position' => array(
-        'tabs' => array(
-            'Общая'     => array(
+    ],
+    'position' => [
+        'tabs' => [
+            'Общая'     => [
                 'id',
                 'email',
                 'password',
@@ -27,114 +27,114 @@ return array(
                 'activated',
                 'created_at',
                 'last_login',
-            ),
-            'Фото' => array(
+            ],
+            'Фото' => [
                 'image',
-            ),
-            'Группа' => array(
+            ],
+            'Группа' => [
                 'many2many_groups',
-            ),
-        )
-    ),
-    'fields' => array(
-        'id' => array(
+            ],
+        ],
+    ],
+    'fields' => [
+        'id' => [
             'caption' => '#',
             'type' => 'readonly',
             'class' => 'col-id',
             'width' => '1%',
             'hide' => true,
-        ),
-        'email' => array(
+        ],
+        'email' => [
             'caption' => 'Email',
             'type' => 'text',
             'filter' => 'text',
             'is_sorting' => true,
-            'placeholder' => "Email",
-            'validation' => array(
-                'server' => array(
+            'placeholder' => 'Email',
+            'validation' => [
+                'server' => [
                     'rules' => 'required|email',
-                    'messages' => array(
+                    'messages' => [
                         'required' => 'Обязательно к заполнению',
-                        "unique" => "Пользователь с таким емейлом уже существует"
-                    ),
-                    'ignore_this_id' => 'users'
-                ),
-                'client' => array(
-                    'rules' => array(
+                        'unique' => 'Пользователь с таким емейлом уже существует',
+                    ],
+                    'ignore_this_id' => 'users',
+                ],
+                'client' => [
+                    'rules' => [
                         'required' => true,
                         'email' => true,
-                    ),
-                    'messages' => array(
+                    ],
+                    'messages' => [
                         'required' => 'Обязательно к заполнению',
-                        'email' => 'Неправильный e-mail'
-                    )
-                )
-            ),
-        ),
-        'password' => array(
+                        'email' => 'Неправильный e-mail',
+                    ],
+                ],
+            ],
+        ],
+        'password' => [
             'caption' => 'Пароль',
             'type' => 'text',
             'hide_list' => true,
-            'placeholder' => "Введите пароль",
+            'placeholder' => 'Введите пароль',
             'is_password' => true,
-            'validation' => array(
-                'server' => array(
-                    'rules' => 'required|min:6'
-                ),
-                'client' => array(
-                    'rules' => array(
+            'validation' => [
+                'server' => [
+                    'rules' => 'required|min:6',
+                ],
+                'client' => [
+                    'rules' => [
                         'required' => true,
-                        'minlength' => 6
-                    ),
-                    'messages' => array(
+                        'minlength' => 6,
+                    ],
+                    'messages' => [
                         'required' => 'Обязательно к заполнению',
-                        'minlength' => 'Пароль долже быть минимум 6-ь символов'
-                    )
-                )
-            ),
-        ),
-        'last_name' => array(
+                        'minlength' => 'Пароль долже быть минимум 6-ь символов',
+                    ],
+                ],
+            ],
+        ],
+        'last_name' => [
             'caption' => 'Фамилия',
             'type'    => 'text',
             'filter' => 'text',
-            'placeholder' => "Фамилия",
+            'placeholder' => 'Фамилия',
             'is_sorting' => true,
-            'validation' => array(
-                'server' => array(
-                    'rules' => 'required'
-                ),
-                'client' => array(
-                    'rules' => array(
-                        'required' => true
-                    ),
-                    'messages' => array(
-                        'required' => 'Обязательно к заполнению'
-                    )
-                )
-            ),
-        ),
-        'first_name' => array(
+            'validation' => [
+                'server' => [
+                    'rules' => 'required',
+                ],
+                'client' => [
+                    'rules' => [
+                        'required' => true,
+                    ],
+                    'messages' => [
+                        'required' => 'Обязательно к заполнению',
+                    ],
+                ],
+            ],
+        ],
+        'first_name' => [
             'caption'   => 'Имя',
             'type'      => 'text',
             'filter'    => 'text',
             'is_sorting' => true,
-            'placeholder' => "Имя",
-            'validation' => array(
-                'server' => array(
-                    'rules' => 'required'
-                ),
-                'client' => array(
-                    'rules' => array(
-                        'required' => true
-                    ),
-                    'messages' => array(
-                        'required' => 'Обязательно к заполнению'
-                    )
-                )
-            ),
-        ),
+            'placeholder' => 'Имя',
+            'validation' => [
+                'server' => [
+                    'rules' => 'required',
+                ],
+                'client' => [
+                    'rules' => [
+                        'required' => true,
+                    ],
+                    'messages' => [
+                        'required' => 'Обязательно к заполнению',
+                    ],
+                ],
+            ],
+        ],
 
-        'image' => array(
+        'image' => [
             'caption' => 'Фото',
             'type' => 'image',
             'storage_type' => 'image', // image|tag|gallery
@@ -143,38 +143,38 @@ return array(
             'is_null' => true,
             'is_remote' => false,
             'hide_list' => true,
-        ),
-        'last_login' => array(
+        ],
+        'last_login' => [
             'caption' => 'Дата последнего входа',
             'type' => 'readonly',
             'is_sorting' => true,
-            'months' => 2
-        ),
-        'activated' => array(
+            'months' => 2,
+        ],
+        'activated' => [
             'caption' => 'Активен',
             'type' => 'checkbox',
-            'options' => array(
+            'options' => [
                 1 => 'Активные',
                 0 => 'He aктивные',
-            ),
+            ],
             'is_sorting' => false,
-        ),
-        'created_at' => array(
+        ],
+        'created_at' => [
             'caption' => 'Дата регистрации',
             'type' => 'readonly',
             'is_sorting' => true,
-            'months' => 2
-        ),
-        'updated_at' => array(
+            'months' => 2,
+        ],
+        'updated_at' => [
             'caption' => 'Дата обновления',
             'type' => 'readonly',
             'hide' => true,
             'is_sorting' => true,
             'months' => 2,
             'hide_list' => true,
-        ),
+        ],
 
-        'many2many_groups' => array(
+        'many2many_groups' => [
             'caption'                        => 'Группы',
             'type'                           => 'many_to_many',
             'show_type'                      => 'select2',
@@ -185,46 +185,46 @@ return array(
             'mtm_external_key_field'         => 'role_id',
             'mtm_external_value_field'       => 'name',
             'mtm_external_table'             => 'roles',
-        ),
-    ),
-    'export' => array(
+        ],
+    ],
+    'export' => [
         'caption'  => 'Экспорт',
         'filename' => 'exp',
         'width'    => '300',
         'date_range_field' => 'created_at',
-        'buttons' => array(
-            'xls' => array(
+        'buttons' => [
+            'xls' => [
                 'caption' => 'в XLS',
-            ),
-            'csv' => array(
+            ],
+            'csv' => [
                 'caption' => 'в CSV',
-                'delimiter' => ';'
-            ),
-        ),
-        'check' => function() {
+                'delimiter' => ';',
+            ],
+        ],
+        'check' => function () {
             return true;
-        }
-    ),
+        },
+    ],
 
-    'actions' => array(
-        'search' => array(
+    'actions' => [
+        'search' => [
             'caption' => 'Поиск',
-        ),
-        'insert' => array(
+        ],
+        'insert' => [
             'caption' => 'Добавить',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
+            },
+        ],
 
-        'update' => array(
+        'update' => [
             'caption' => 'Редактировать',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'delete' => array(
+            },
+        ],
+        'delete' => [
             'caption' => 'Удалить',
-        ),
-    ),
-);
+        ],
+    ],
+];

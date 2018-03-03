@@ -2,23 +2,22 @@
 
 namespace Vis\Builder;
 
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Response;
 
 class TBTreeController extends \Controller
 {
-
     public function showTree()
     {
         $tree = Tree::all()->toHierarchy();
-        
-        $idNode  = Input::get('node', 1);
+
+        $idNode = Input::get('node', 1);
         $current = Tree::find($idNode);
 
-        $parentIDs = array();
+        $parentIDs = [];
         foreach ($current->getAncestors() as $anc) {
             $parentIDs[] = $anc->id;
         }
@@ -28,15 +27,15 @@ class TBTreeController extends \Controller
         if (isset($templates[$current->template])) {
             $template = $templates[$current->template];
         }
-        
+
         if ($template['type'] == 'table') {
-            $options = array(
+            $options = [
                 'url'      => \URL::current(),
-                'def_name' => 'tree.'. $template['definition'],
-                'additional' => array(
-                    'node' => $idNode
-                )
-            );
+                'def_name' => 'tree.'.$template['definition'],
+                'additional' => [
+                    'node' => $idNode,
+                ],
+            ];
             list($table, $form) = \Jarboe::table($options);
             $content = View::make('admin::tree.content', compact('current', 'table', 'form', 'template'));
         } elseif (false && $current->isLeaf()) {
@@ -44,10 +43,12 @@ class TBTreeController extends \Controller
         } else {
             $content = View::make('admin::tree.content', compact('current', 'template'));
         }
-        
+
         return View::make('admin::tree', compact('tree', 'content', 'current', 'parentIDs'));
-    } // end showTree
-    
+    }
+
+    // end showTree
+
     public function getEditModalForm()
     {
         $idNode = Input::get('id');
@@ -57,24 +58,26 @@ class TBTreeController extends \Controller
         if (isset($templates[$current->template])) {
             $template = $templates[$current->template];
         }
-        
-        $options = array(
+
+        $options = [
             'url'      => \URL::current(),
-            'def_name' => 'tree.'. $template['node_definition'],
-            'additional' => array(
-                'node' => $idNode
-            )
-        );
+            'def_name' => 'tree.'.$template['node_definition'],
+            'additional' => [
+                'node' => $idNode,
+            ],
+        ];
         $controller = new JarboeController($options);
-        
+
         $html = $controller->view->showEditForm($idNode, true);
-        
-        return Response::json(array(
+
+        return Response::json([
             'status' => true,
-            'html' => $html
-        ));
-    } // end getEditModalForm
-    
+            'html' => $html,
+        ]);
+    }
+
+    // end getEditModalForm
+
     public function doEditNode()
     {
         $idNode = Input::get('id');
@@ -85,14 +88,14 @@ class TBTreeController extends \Controller
         if (isset($templates[$current->template])) {
             $template = $templates[$current->template];
         }
-        
-        $options = array(
+
+        $options = [
             'url'      => \URL::current(),
-            'def_name' => 'tree.'. $template['definition'],
-            'additional' => array(
-                'node' => $idNode
-            )
-        );
+            'def_name' => 'tree.'.$template['definition'],
+            'additional' => [
+                'node' => $idNode,
+            ],
+        ];
 
         $controller = new JarboeController($options);
 
@@ -103,24 +106,27 @@ class TBTreeController extends \Controller
         $this->doFlushTreeStructureCache();
 
         return Response::json($result);
-    } // end doEditNode
-    
+    }
+
+    // end doEditNode
+
     public function doDeleteNode()
     {
         $item = Tree::find(Input::get('id'));
         $status = $item->delete();
-        
-        
+
         $this->doFlushTreeStructureCache();
-        
-        return Response::json(array(
-            'status' => $status
-        ));
-    } // end doDeleteNode
+
+        return Response::json([
+            'status' => $status,
+        ]);
+    }
+
+    // end doDeleteNode
 
     public function handleTree()
     {
-        $idNode  = Input::get('node', 1);
+        $idNode = Input::get('node', 1);
         $current = Tree::find($idNode);
 
         $templates = Config::get('builder::tree.templates');
@@ -128,37 +134,40 @@ class TBTreeController extends \Controller
         if (isset($templates[$current->template])) {
             $template = $templates[$current->template];
         }
-        
+
         if ($template['type'] == 'table') {
-            $options = array(
+            $options = [
                 'url'      => \URL::current(),
-                'def_name' => 'tree.'. $template['definition'],
-                'additional' => array(
-                    'node' => $idNode
-                )
-            );
+                'def_name' => 'tree.'.$template['definition'],
+                'additional' => [
+                    'node' => $idNode,
+                ],
+            ];
+
             return \Jarboe::table($options);
         }
 
         //
-    } // end handleTree
-    
+    }
+
+    // end handleTree
+
     public function changePosition()
     {
         $id = Input::get('id');
         $idParent = Input::get('parent_id', 1);
-        $idLeftSibling  = Input::get('left_sibling_id');
+        $idLeftSibling = Input::get('left_sibling_id');
         $idRightSibling = Input::get('right_sibling_id');
-        
+
         $item = Tree::find($id);
         $root = Tree::find($idParent);
-        
+
         $prevParentID = $item->parent_id;
         $item->makeChildOf($root);
-        
+
         $item->slug = $item->slug;
         $item->save();
-        
+
         if ($prevParentID == $idParent) {
             if ($idLeftSibling) {
                 $item->moveToRightOf(Tree::find($idLeftSibling));
@@ -170,71 +179,82 @@ class TBTreeController extends \Controller
         $this->doFlushTreeStructureCache();
 
         $item = Tree::find($item->id);
-        
-        $data = array(
+
+        $data = [
             'status' => true,
             'item' => $item,
-            'parent_id' => $root->id
-        );
+            'parent_id' => $root->id,
+        ];
+
         return Response::json($data);
-    } // end changePosition
-    
+    }
+
+    // end changePosition
+
     private function doFlushTreeStructureCache()
     {
         \Cache::tags('j_tree')->flush();
-    } // end doFlushTreeStructureCache
+    }
+
+    // end doFlushTreeStructureCache
 
     public function changeActive()
     {
         $activeField = \Config::get('builder::tree.node_active_field.field');
-        $options = \Config::get('builder::tree.node_active_field.options', array());
-        
+        $options = \Config::get('builder::tree.node_active_field.options', []);
+
         $value = Input::get('is_active');
         if ($options) {
-            $value = implode(array_filter(Input::get('onoffswitch', array())), ',');
+            $value = implode(array_filter(Input::get('onoffswitch', [])), ',');
         }
-        
-        DB::table('tb_tree')->where('id', Input::get('id'))->update(array(
-            $activeField => $value
-        ));
-        
+
+        DB::table('tb_tree')->where('id', Input::get('id'))->update([
+            $activeField => $value,
+        ]);
+
         $this->doFlushTreeStructureCache();
-    } // end changeActive
-    
+    }
+
+    // end changeActive
+
     public function doCreateNode()
     {
         $root = Tree::find(Input::get('node', 1));
-        
+
         $node = new Tree();
         $node->parent_id = Input::get('node', 1);
-        $node->title     = Input::get('title');
-        $node->slug      = Input::get('slug') ? : Input::get('title');
-        $node->template  = Input::get('template');
+        $node->title = Input::get('title');
+        $node->slug = Input::get('slug') ?: Input::get('title');
+        $node->template = Input::get('template');
         $node->is_active = '0';
         $node->save();
-        
+
         $node->makeChildOf($root);
 
         $this->doFlushTreeStructureCache();
-        
-        return Response::json(array(
+
+        return Response::json([
             'status' => true,
-        ));
-    } // end doCreateNode
-    
+        ]);
+    }
+
+    // end doCreateNode
+
     public function doUpdateNode()
     {
         switch (Input::get('name')) {
             case 'template':
-                DB::table('tb_tree')->where('id', Input::get('pk'))->update(array(
-                    'template' => Input::get('value')
-                ));
+                DB::table('tb_tree')->where('id', Input::get('pk'))->update([
+                    'template' => Input::get('value'),
+                ]);
                 break;
-            
+
             default:
                 throw new \RuntimeException('someone tries to hack me :c');
         }
-        
+
         $this->doFlushTreeStructureCache();
-    } // end doUpdateNode
+    }
+
+    // end doUpdateNode
 }

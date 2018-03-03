@@ -4,59 +4,57 @@ Route::group(['middleware' => ['web']], function () {
     Route::group(
         ['prefix' => 'admin', 'middleware' => 'auth.admin'],
         function () {
-
             Route::any(
                 '/settings/settings_all',
-                array(
+                [
                 'as' => 'm.show_settings',
-                'uses' => 'Vis\Builder\SettingsController@fetchIndex'
-                )
+                'uses' => 'Vis\Builder\SettingsController@fetchIndex',
+                ]
             );
 
             if (Request::ajax()) {
                 Route::post(
                     '/settings/create_pop',
-                    array(
+                    [
                     'as' => 'm.created_settings',
-                    'uses' => 'Vis\Builder\SettingsController@fetchCreate'
-                    )
+                    'uses' => 'Vis\Builder\SettingsController@fetchCreate',
+                    ]
                 );
-                        Route::post(
+                Route::post(
                             '/settings/add_record',
-                            array(
+                            [
                             'as' => 'm.add_settings',
-                            'uses' => 'Vis\Builder\SettingsController@doSave'
-                            )
+                            'uses' => 'Vis\Builder\SettingsController@doSave',
+                            ]
                         );
-                        Route::post(
+                Route::post(
                             '/settings/delete',
-                            array(
+                            [
                             'as' => 'm.del_settings',
-                            'uses' => 'Vis\Builder\SettingsController@doDeleteSetting'
-                            )
+                            'uses' => 'Vis\Builder\SettingsController@doDeleteSetting',
+                            ]
                         );
-                        Route::post(
+                Route::post(
                             '/settings/edit_record',
-                            array(
+                            [
                             'as' => 'm.edit_settings',
-                            'uses' => 'Vis\Builder\SettingsController@fetchEdit'
-                            )
+                            'uses' => 'Vis\Builder\SettingsController@fetchEdit',
+                            ]
                         );
-                        Route::post(
+                Route::post(
                             '/settings/del_select',
-                            array(
+                            [
                             'as' => 'm.del_select_setting',
-                            'uses' => 'Vis\Builder\SettingsController@doDeleteSettingSelect'
-                            )
+                            'uses' => 'Vis\Builder\SettingsController@doDeleteSettingSelect',
+                            ]
                         );
-                        Route::post(
+                Route::post(
                             '/settings/fast_save',
-                            array(
+                            [
                                 'as' => 'm.fast_save_setting',
-                                'uses' => 'Vis\Builder\SettingsController@doFastSave'
-                            )
+                                'uses' => 'Vis\Builder\SettingsController@doFastSave',
+                            ]
                         );
-
             }
         }
     );

@@ -1,11 +1,12 @@
-<?php namespace Vis\Builder\Handlers;
+<?php
+
+namespace Vis\Builder\Handlers;
 
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 
 class ActionsHandler
 {
-    
     protected $def;
     protected $controller;
 
@@ -14,13 +15,13 @@ class ActionsHandler
         $this->def = $actionsDefinition;
         $this->controller = $controller;
     }
-    
-    public function fetch($type, $row = array(), $buttonDefinition = array())
+
+    public function fetch($type, $row = [], $buttonDefinition = [])
     {
         switch ($type) {
             case 'insert':
                 return $this->onInsertButton();
-                
+
             case 'update':
                 return $this->onUpdateButton($row);
 
@@ -49,43 +50,47 @@ class ActionsHandler
                 return;
         }
     }
-    
+
     private function onCustomButton($row, $button)
     {
         $action = view('admin::tb.action_custom');
         $action->row = $row;
         $action->def = $button;
         $action->definition = $this->controller->getDefinition();
-        
+
         return $action;
     }
-    
+
     private function onInsertButton()
     {
         if ($this->controller->hasCustomHandlerMethod('onInsertButtonFetch')) {
             $res = $this->controller->getCustomHandler()->onInsertButtonFetch($this->def['insert']);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
-        
+
         $action = view('admin::tb.action_insert');
         $action->def = $this->def['insert'];
         $action->definition = $this->controller->getDefinition();
-        
+
         return $action;
     }
-    
+
     private function onUpdateButton($row)
     {
         if ($this->controller->hasCustomHandlerMethod('onUpdateButtonFetch')) {
             $res = $this->controller->getCustomHandler()->onUpdateButtonFetch($this->def['update']);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
-        
+
         $action = view('admin::tb.action_update');
         $action->row = $row;
         $action->def = $this->def['update'];
         $action->definition = $this->controller->getDefinition();
-        
+
         return $action;
     }
 
@@ -103,7 +108,9 @@ class ActionsHandler
     {
         if ($this->controller->hasCustomHandlerMethod('onCloneButtonFetch')) {
             $res = $this->controller->getCustomHandler()->onUpdateButtonFetch($this->def['clone']);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
 
         $action = View::make('admin::tb.action_clone');
@@ -136,7 +143,7 @@ class ActionsHandler
 
         $params['show'] = 1;
 
-        $action->url .= '?' . http_build_query($params);
+        $action->url .= '?'.http_build_query($params);
 
         return $action;
     }
@@ -149,7 +156,7 @@ class ActionsHandler
         $action->definition = $this->controller->getDefinition();
         $model = $action->definition['options']['model'];
         $action->model = $model;
-        $action->url =  $this->getUrl($action, $model, $row['id'])."?mode=construct";
+        $action->url = $this->getUrl($action, $model, $row['id']).'?mode=construct';
 
         return $action;
     }
@@ -170,14 +177,16 @@ class ActionsHandler
     {
         if ($this->controller->hasCustomHandlerMethod('onDeleteButtonFetch')) {
             $res = $this->controller->getCustomHandler()->onDeleteButtonFetch($this->def['delete']);
-            if ($res)  return $res;
+            if ($res) {
+                return $res;
+            }
         }
-        
+
         $action = view('admin::tb.action_delete');
         $action->row = $row;
         $action->def = $this->def['delete'];
         $action->definition = $this->controller->getDefinition();
-        
+
         return $action;
     }
 }

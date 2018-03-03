@@ -1,10 +1,12 @@
-<?php namespace Vis\Builder\Helpers;
+<?php
 
-use Vis\Builder\Handlers\CustomHandler;
-use Illuminate\Support\Facades\View;
-use Cartalyst\Sentinel\Laravel\Facades\Activation;
-use Cartalyst\Sentinel\Laravel\Facades\Sentinel;
+namespace Vis\Builder\Helpers;
+
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
+use Vis\Builder\Handlers\CustomHandler;
+use Cartalyst\Sentinel\Laravel\Facades\Sentinel;
+use Cartalyst\Sentinel\Laravel\Facades\Activation;
 
 class UsersHandler extends CustomHandler
 {
@@ -13,8 +15,8 @@ class UsersHandler extends CustomHandler
      */
     public function onGetListValue($formField, array &$row)
     {
-        if ($formField->getFieldName() == "activated") {
-            $activation = DB::table("activations")->where("user_id", $row['id'])->where("completed", 1)->count();
+        if ($formField->getFieldName() == 'activated') {
+            $activation = DB::table('activations')->where('user_id', $row['id'])->where('completed', 1)->count();
 
             if ($activation) {
                 return View::make('admin::tb.input_checkbox_list')->with('is_checked', 1);
@@ -29,23 +31,23 @@ class UsersHandler extends CustomHandler
      */
     public function onAddSelectField($formField, $row)
     {
-        if ($formField->getFieldName() == "activated") {
+        if ($formField->getFieldName() == 'activated') {
             return true;
         }
     }
 
     public function onGetValue($formField, array &$row, &$postfix)
     {
-        if ($formField->getFieldName() == "activated") {
-            if (!isset($row['id'])) {
-                return "0";
+        if ($formField->getFieldName() == 'activated') {
+            if (! isset($row['id'])) {
+                return '0';
             }
-            $activation = DB::table("activations")->where("user_id", $row['id'])->where("completed", 1)->count();
+            $activation = DB::table('activations')->where('user_id', $row['id'])->where('completed', 1)->count();
 
             if ($activation == 0) {
-                return "0";
+                return '0';
             } else {
-                return "1";
+                return '1';
             }
         }
     }
@@ -66,10 +68,10 @@ class UsersHandler extends CustomHandler
                 Activation::complete($user, $activation->code);
             }
 
-            if ($value['password'] && $value['password'] != "password") {
-                Sentinel::update($user, array('password' => $value['password']));
+            if ($value['password'] && $value['password'] != 'password') {
+                Sentinel::update($user, ['password' => $value['password']]);
             }
-            
+
             unset($value['activated']);
             unset($value['password']);
         }

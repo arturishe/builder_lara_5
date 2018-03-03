@@ -1,4 +1,6 @@
-<?php namespace Vis\Builder\Helpers\Traits;
+<?php
+
+namespace Vis\Builder\Helpers\Traits;
 
 use Vis\Builder\Setting;
 use Illuminate\Support\Facades\Config;
@@ -11,21 +13,25 @@ trait ImagesTrait
     * @param  string|integer $height
     * @return string tag img
     */
-    public function getImg($width = '', $height = '', $options = array())
+    public function getImg($width = '', $height = '', $options = [])
     {
         $img_res = $this->getImgPath($width, $height, $options);
 
         return  '<img src = "'.$img_res.'" title = "'.e($this->title).'" alt = "'.e($this->title).'">';
-    } // end getImg
+    }
 
-    public function getImgLang($width = '', $height = '', $options = array())
+    // end getImg
+
+    public function getImgLang($width = '', $height = '', $options = [])
     {
         $img_res = $this->getImgPath($width, $height, $options, $lang = true);
 
         return  '<img src = "'.$img_res.'" title = "'.e($this->t('title')).'" alt = "'.e($this->t('title')).'">';
-    } // end getImg
+    }
 
-    public function getImgPath($width = '', $height = '', $options = array(), $lang = false)
+    // end getImg
+
+    public function getImgPath($width = '', $height = '', $options = [], $lang = false)
     {
         $picture = $this->picture;
 
@@ -33,8 +39,8 @@ trait ImagesTrait
             $picture = $this->t('picture');
         }
 
-        if (!$picture) {
-            $picture = Setting::get("no-foto");
+        if (! $picture) {
+            $picture = Setting::get('no-foto');
         }
 
         $size = [];
@@ -46,7 +52,7 @@ trait ImagesTrait
             $size['h'] = $height;
         }
 
-        $params = array_merge($size, $options) ;
+        $params = array_merge($size, $options);
 
         return  glide($picture, $params);
     }
@@ -57,9 +63,9 @@ trait ImagesTrait
      * @param array $paramImg param width,height,fit
      * @return array list small images
      */
-    public function getOtherImg($nameField = "additional_pictures", $paramImg = "")
+    public function getOtherImg($nameField = 'additional_pictures', $paramImg = '')
     {
-        if (!$this->$nameField) {
+        if (! $this->$nameField) {
             return;
         }
 
@@ -70,16 +76,16 @@ trait ImagesTrait
             if ($paramImg) {
                 $imagesRes[] = glide($imgOne, $paramImg);
             } else {
-                $imagesRes[] = "/" . $imgOne;
+                $imagesRes[] = '/'.$imgOne;
             }
         }
 
         return $imagesRes;
     }
 
-    public function getOtherImgWatermark($nameField = "additional_pictures", $paramImg = "")
+    public function getOtherImgWatermark($nameField = 'additional_pictures', $paramImg = '')
     {
-        if (!$this->$nameField) {
+        if (! $this->$nameField) {
             return;
         }
 
@@ -88,13 +94,13 @@ trait ImagesTrait
         $imagesRes = [];
         foreach ($images as $imgOne) {
             if ($paramImg) {
-                if (Config::get("builder.watermark.active") && $imgOne) {
-                    $imagesRes[] = "/img/watermark/" . ltrim($imgOne, "/");
+                if (Config::get('builder.watermark.active') && $imgOne) {
+                    $imagesRes[] = '/img/watermark/'.ltrim($imgOne, '/');
                 } else {
                     $imagesRes[] = glide($imgOne, $paramImg);
                 }
             } else {
-                $imagesRes[] = "/" . $imgOne;
+                $imagesRes[] = '/'.$imgOne;
             }
         }
 
@@ -102,14 +108,14 @@ trait ImagesTrait
     }
 
     /**
-     * get array additional pictures with original img in key
+     * get array additional pictures with original img in key.
      *
      * @param string $nameField
      * @param string $paramImg
      */
-    public function getOtherImgWithOriginal($nameField = "additional_pictures", $paramImg = "")
+    public function getOtherImgWithOriginal($nameField = 'additional_pictures', $paramImg = '')
     {
-        if (!$this->$nameField) {
+        if (! $this->$nameField) {
             return;
         }
 
@@ -118,19 +124,19 @@ trait ImagesTrait
         $imagesRes = [];
         foreach ($images as $imgOne) {
             if ($paramImg) {
-                $imagesRes["/" . $imgOne] = glide($imgOne, $paramImg);
+                $imagesRes['/'.$imgOne] = glide($imgOne, $paramImg);
             } else {
-                $imagesRes[] = "/" . $imgOne;
+                $imagesRes[] = '/'.$imgOne;
             }
         }
 
         return $imagesRes;
     }
 
-    public function getWatermark($width = '', $height = '', $options = array())
+    public function getWatermark($width = '', $height = '', $options = [])
     {
-        if (Config::get("builder.watermark.active") && $this->picture) {
-            return "/img/watermark/" . ltrim($this->picture, "/");
+        if (Config::get('builder.watermark.active') && $this->picture) {
+            return '/img/watermark/'.ltrim($this->picture, '/');
         } else {
             return $this->getImgPath($width, $height, $options);
         }

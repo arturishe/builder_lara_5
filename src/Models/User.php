@@ -1,11 +1,12 @@
-<?php namespace Vis\Builder;
+<?php
 
-use Cartalyst\Sentinel\Users\EloquentUser;
+namespace Vis\Builder;
+
 use DB;
+use Cartalyst\Sentinel\Users\EloquentUser;
 
 class User extends EloquentUser
 {
-
     protected $table = 'users';
 
     public function setFillable(array $params)
@@ -18,7 +19,7 @@ class User extends EloquentUser
         if ($this->image) {
             $image = $this->image;
         } else {
-            $image = "/packages/vis/builder/img/blank_avatar.gif";
+            $image = '/packages/vis/builder/img/blank_avatar.gif';
         }
 
         return glide($image, $imgParam);
@@ -26,11 +27,11 @@ class User extends EloquentUser
 
     public function getFullName()
     {
-        return $this->first_name." ".$this->last_name;
+        return $this->first_name.' '.$this->last_name;
     }
 
-    public function getIdsTreeAccess() {
-
+    public function getIdsTreeAccess()
+    {
         return DB::table('role_users')
             ->leftJoin('roles2tree', 'roles2tree.id_role', '=', 'role_users.role_id')
             ->where('user_id', $this->id)

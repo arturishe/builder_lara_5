@@ -1,4 +1,6 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
 
 class BaseModel extends Eloquent
 {
@@ -10,19 +12,19 @@ class BaseModel extends Eloquent
         \Vis\Builder\Helpers\Traits\GroupsFieldTrait,
         \Vis\Builder\Helpers\Traits\Rememberable;
 
-    protected $revisionFormattedFieldNames = array(
+    protected $revisionFormattedFieldNames = [
         'title'  => 'Название',
         'description'  => 'Описание',
         'is_active' => 'Активация',
         'picture' => 'Изображение',
         'short_description' => 'Короткий текст',
-        'created_at' => 'Дата создания'
-    );
-    protected $revisionFormattedFields = array(
+        'created_at' => 'Дата создания',
+    ];
+    protected $revisionFormattedFields = [
         '1'  => 'string:<strong>%s</strong>',
         'public' => 'boolean:No|Yes',
-        'deleted_at' => 'isEmpty:Active|Deleted'
-    );
+        'deleted_at' => 'isEmpty:Active|Deleted',
+    ];
 
     protected $revisionCleanup = true;
     protected $revisionCreationsEnabled = true;
@@ -64,19 +66,22 @@ class BaseModel extends Eloquent
 
     public function getUri()
     {
-        return '/news/'. $this->getSlug().'-'. $this->id;
-    } // end getUri
+        return '/news/'.$this->getSlug().'-'.$this->id;
+    }
+
+    // end getUri
 
     public function getDate()
     {
         $date = strtotime($this->created_at);
 
-        return date("d", $date)." ".$this->getMonth($this->created_at)." ".date("Y", $date);
-    } // end getCreatedDate
+        return date('d', $date).' '.$this->getMonth($this->created_at).' '.date('Y', $date);
+    }
+
+    // end getCreatedDate
 
     public function getMonth($date)
     {
-
         $month = [
             '1' => 'Января',
             '2' => 'Февраля',
@@ -89,12 +94,11 @@ class BaseModel extends Eloquent
             '9' => 'Сентября',
             '10' => 'Октября',
             '11' => 'Ноября',
-            '12' => 'Декабря'
+            '12' => 'Декабря',
         ];
 
-        return  __($month[date("n", strtotime($date))]);
+        return  __($month[date('n', strtotime($date))]);
     }
-
 
     /*
      * filter active page
@@ -111,7 +115,7 @@ class BaseModel extends Eloquent
      */
     public static function scopeOrderPriority($query)
     {
-        return $query->orderBy("priority", "asc");
+        return $query->orderBy('priority', 'asc');
     }
 
     /*
@@ -123,9 +127,9 @@ class BaseModel extends Eloquent
      */
     public function scopePageInfo($query, $slug, $id)
     {
-        $page = $query->where("id", $id)->active()->first();
+        $page = $query->where('id', $id)->active()->first();
 
-        if (!isset($page->id) || $page->getSlug() != $slug) {
+        if (! isset($page->id) || $page->getSlug() != $slug) {
             App::abort(404);
         }
 
@@ -137,44 +141,47 @@ class BaseModel extends Eloquent
     */
     public function getNextPage()
     {
-        $next_page = self::where("is_active", "1")
-            ->where("priority", '>', $this->priority)->where("id", "!=", $this->id)
-            ->orderBy("priority", "asc")
-            ->orderBy("id", "desc")
+        $next_page = self::where('is_active', '1')
+            ->where('priority', '>', $this->priority)->where('id', '!=', $this->id)
+            ->orderBy('priority', 'asc')
+            ->orderBy('id', 'desc')
             ->first();
 
-
-        if (!$next_page) {
-            $next_page = self::where("is_active", "1")
-                ->where("id", "!=", $this->id)
-                ->orderBy("priority", "asc")
-                ->orderBy("id", "asc")
+        if (! $next_page) {
+            $next_page = self::where('is_active', '1')
+                ->where('id', '!=', $this->id)
+                ->orderBy('priority', 'asc')
+                ->orderBy('id', 'asc')
                 ->first();
         }
 
         return $next_page->getUrl();
-    } //end next_page
+    }
+
+    //end next_page
 
     /*
      * prev page
      */
     public function getPrevPage()
     {
-        $prev_page = self::where("is_active", "1")
-            ->where("priority", '<', $this->priority)->where("id", "!=", $this->id)
-            ->orderBy("priority", "desc")
-            ->orderBy("id", "desc")->first();
+        $prev_page = self::where('is_active', '1')
+            ->where('priority', '<', $this->priority)->where('id', '!=', $this->id)
+            ->orderBy('priority', 'desc')
+            ->orderBy('id', 'desc')->first();
 
-        if (!$prev_page) {
-            $prev_page = self::where("is_active", "1")
-                ->where("id", "!=", $this->id)
-                ->orderBy("priority", "desc")
-                ->orderBy("id", "desc")
+        if (! $prev_page) {
+            $prev_page = self::where('is_active', '1')
+                ->where('id', '!=', $this->id)
+                ->orderBy('priority', 'desc')
+                ->orderBy('id', 'desc')
                 ->first();
         }
 
         return $prev_page->getUrl();
-    }//end prev_page
+    }
+
+    //end prev_page
 
     /*
      * get node this page
@@ -182,20 +189,20 @@ class BaseModel extends Eloquent
      */
     public function getNode()
     {
-        $segments =  $segments = explode('/', Request::path());
-        $nodeSlug = "";
+        $segments = $segments = explode('/', Request::path());
+        $nodeSlug = '';
 
         //search last segment not url page
         foreach ($segments as $segment) {
-            if ($segment != $this->getSlug().'-'. $this->id) {
+            if ($segment != $this->getSlug().'-'.$this->id) {
                 $nodeSlug = $segment;
             }
         }
 
-        if (!$nodeSlug) {
+        if (! $nodeSlug) {
             return false;
         } else {
-            return Tree::where("slug", "like", $nodeSlug)->first();
+            return Tree::where('slug', 'like', $nodeSlug)->first();
         }
     }
 }

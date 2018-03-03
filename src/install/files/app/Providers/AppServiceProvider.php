@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use View;
+use Cache;
+use Breadcrumbs;
+use App\Models\Tree;
 use Illuminate\Support\ServiceProvider;
-use View, Cache, App\Models\Tree, Breadcrumbs;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,10 +17,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
-        View::composer(array('partials.header'), function ($view) {
-
-            $menu = Cache::tags(array('tree'))->rememberForever('menuProduct', function () {
+        View::composer(['partials.header'], function ($view) {
+            $menu = Cache::tags(['tree'])->rememberForever('menuProduct', function () {
                 $menu = Tree::isMenu()->get();
 
                 return $menu;
@@ -26,9 +27,8 @@ class AppServiceProvider extends ServiceProvider
             $view->with('menu', $menu);
         });
 
-        View::composer(array('partials.footer'), function ($view) {
-
-            $menu = Cache::tags(array('tree'))->rememberForever('menuProduct', function () {
+        View::composer(['partials.footer'], function ($view) {
+            $menu = Cache::tags(['tree'])->rememberForever('menuProduct', function () {
                 $menu = Tree::isMenu()->get();
 
                 return $menu;
@@ -36,17 +36,15 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('menu', $menu);
         });
-
 
         View::composer('partials.breadcrumbs', function ($view) {
-
-            if (!isset($view->getData()['page'])) {
-                return "Не передан параметр";
+            if (! isset($view->getData()['page'])) {
+                return 'Не передан параметр';
             }
             $page = $view->getData()['page'];
 
             //if node
-            if (get_class($page) == "Tree" || get_class($page) == "NewsTree") {
+            if (get_class($page) == 'Tree' || get_class($page) == 'NewsTree') {
                 $breadcrumbs = new Breadcrumbs($page);
             } else {
                 $node = $page->getNode();

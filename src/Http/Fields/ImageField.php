@@ -1,19 +1,21 @@
-<?php namespace Vis\Builder\Fields;
+<?php
 
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\File;
+namespace Vis\Builder\Fields;
+
 use Vis\Builder\Facades\Jarboe;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\View;
 
 class ImageField extends AbstractField
 {
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function getListValue($row)
     {
@@ -29,25 +31,29 @@ class ImageField extends AbstractField
         }
 
         return $this->getListSingle($row);
-    } // end getListValue
+    }
+
+    // end getListValue
 
     private function getListSingle($row)
     {
         $pathPhoto = $this->getValue($row);
 
-        if (!$pathPhoto) {
+        if (! $pathPhoto) {
             return '';
         }
 
-        $html = '<a class="screenshot"  rel="' . glide($pathPhoto, ['w' => '350']) . '">
-                    <img src="' . glide($pathPhoto, ['w' => '50']) . '" /></a>';
+        $html = '<a class="screenshot"  rel="'.glide($pathPhoto, ['w' => '350']).'">
+                    <img src="'.glide($pathPhoto, ['w' => '50']).'" /></a>';
 
         return $html;
-    } // end getListSingle
+    }
+
+    // end getListSingle
 
     private function getListMultiple($row)
     {
-        if (!$this->getValue($row)) {
+        if (! $this->getValue($row)) {
             return '';
         }
 
@@ -58,44 +64,52 @@ class ImageField extends AbstractField
             $src = $source;
 
             $src = $this->getAttribute('is_remote') ? $src : URL::asset($src);
-            $html .= '<img height="'. $this->getAttribute('img_height', '50px') .'" src="'
-                . $src
-                . '" /><br>';
+            $html .= '<img height="'.$this->getAttribute('img_height', '50px').'" src="'
+                .$src
+                .'" /><br>';
         }
 
         $html .= '</div>';
 
         return $html;
-    } // end getListMultiple
+    }
+
+    // end getListMultiple
 
     public function onSearchFilter(&$db, $value)
     {
         $db->where($this->getFieldName(), 'LIKE', '%'.$value.'%');
-    } // end onSearchFilter
+    }
 
-    public function getTabbedEditInput($row = array())
+    // end onSearchFilter
+
+    public function getTabbedEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetTabbedEditInput')) {
             $res = $this->handler->onGetTabbedEditInput($this, $row);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
 
         $type = $this->getAttribute('type');
 
-        $input = View::make('admin::tb.tab_input_'. $type);
+        $input = View::make('admin::tb.tab_input_'.$type);
         $input->value = $this->getValue($row);
-        $input->name  = $this->getFieldName();
-        $input->rows  = $this->getAttribute('rows');
+        $input->name = $this->getFieldName();
+        $input->rows = $this->getAttribute('rows');
         $input->caption = $this->getAttribute('caption');
         $input->tabs = $this->getPreparedTabs($row);
         $input->is_multiple = $this->getAttribute('is_multiple');
-        $input->delimiter   = $this->getAttribute('delimiter');
-        $input->width   = $this->getAttribute('img_width', 200);
-        $input->height   = $this->getAttribute('img_height', 200);
+        $input->delimiter = $this->getAttribute('delimiter');
+        $input->width = $this->getAttribute('img_width', 200);
+        $input->height = $this->getAttribute('img_height', 200);
         $input->chooseFromUploaded = $this->getAttribute('choose_from_uploaded', true);
 
         return $input->render();
-    } // end getTabbedEditInput
+    }
+
+    // end getTabbedEditInput
 
     protected function getPreparedTabs($row)
     {
@@ -106,29 +120,35 @@ class ImageField extends AbstractField
         }
 
         return $tabs;
-    } // end getPreparedTabs
+    }
 
-    public function getEditInput($row = array())
+    // end getPreparedTabs
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
 
         $input = View::make('admin::tb.input_image_upload');
-        $input->value   = $this->getValue($row);
-        $input->source  = json_decode($this->getValue($row), true);
-        $input->name    = $this->getFieldName();
+        $input->value = $this->getValue($row);
+        $input->source = json_decode($this->getValue($row), true);
+        $input->name = $this->getFieldName();
         $input->caption = $this->getAttribute('caption');
         $input->is_multiple = $this->getAttribute('is_multiple');
-        $input->delimiter   = $this->getAttribute('delimiter');
-        $input->width   = $this->getAttribute('img_width', 200);
-        $input->height   = $this->getAttribute('img_height', 200);
+        $input->delimiter = $this->getAttribute('delimiter');
+        $input->width = $this->getAttribute('img_width', 200);
+        $input->height = $this->getAttribute('img_height', 200);
         $input->chooseFromUploaded = $this->getAttribute('choose_from_uploaded', true);
         $input->baseName = $this->getFieldName();
 
         return $input->render();
-    } // end getEditInput
+    }
+
+    // end getEditInput
 
     public function doUpload($file)
     {
@@ -138,52 +158,52 @@ class ImageField extends AbstractField
 
         $extension = $this->getExtension($file->guessExtension());
 
-        $rawFileName = md5_file($file->getRealPath()) .'_'. time();
-        $fileName = $rawFileName .'.'. $extension;
+        $rawFileName = md5_file($file->getRealPath()).'_'.time();
+        $fileName = $rawFileName.'.'.$extension;
 
         $destinationPath = 'storage/editor/fotos/';
 
-        if ($model && request("page_id")) {
-            $infoPage = $model::find(request("page_id"));
-            $slugPage = isset($infoPage->title) ? Jarboe::urlify(strip_tags($infoPage->title)) : request("page_id");
-            $fileName = $slugPage . '.' . $extension;
+        if ($model && request('page_id')) {
+            $infoPage = $model::find(request('page_id'));
+            $slugPage = isset($infoPage->title) ? Jarboe::urlify(strip_tags($infoPage->title)) : request('page_id');
+            $fileName = $slugPage.'.'.$extension;
             if (File::exists($destinationPath.$fileName)) {
-                $fileName = $slugPage . '_' . time() . rand(1, 1000) . '.' . $extension;
+                $fileName = $slugPage.'_'.time().rand(1, 1000).'.'.$extension;
             }
         }
 
         $status = $file->move($destinationPath, $fileName);
 
-        $data = array();
-        $data['sizes']['original'] = $destinationPath . $fileName;
+        $data = [];
+        $data['sizes']['original'] = $destinationPath.$fileName;
 
-        $width   = $this->getAttribute('img_width', 200);
-        $height   = $this->getAttribute('img_height', 200);
+        $width = $this->getAttribute('img_width', 200);
+        $height = $this->getAttribute('img_height', 200);
 
-        $link = $extension == 'svg' ? $destinationPath . $fileName
-                                    : glide($destinationPath . $fileName, ['w' => $width, 'h' => $height]);
+        $link = $extension == 'svg' ? $destinationPath.$fileName
+                                    : glide($destinationPath.$fileName, ['w' => $width, 'h' => $height]);
 
         $this->saveInImageStore($fileName, $link);
 
-        $returnView = request("type") == "single_photo" ? "admin::tb.html_image_single" : "admin::tb.html_image";
+        $returnView = request('type') == 'single_photo' ? 'admin::tb.html_image_single' : 'admin::tb.html_image';
 
-        $response = array(
+        $response = [
             'data'       => $data,
             'status'     => $status,
             'link'       => $link,
-            'short_link' => $destinationPath . $fileName,
+            'short_link' => $destinationPath.$fileName,
             'delimiter' => ',',
-            "html" => view(
+            'html' => view(
                 $returnView,
                 ['link' => $link,
                  'data' => $data,
-                 'value' => $destinationPath . $fileName,
-                 'name' => request("ident"),
+                 'value' => $destinationPath.$fileName,
+                 'name' => request('ident'),
                  'width' => $width,
-                 'height' => $height
+                 'height' => $height,
                 ]
-            )->render()
-        );
+            )->render(),
+        ];
 
         return $response;
     }
@@ -199,9 +219,11 @@ class ImageField extends AbstractField
 
     private function saveInImageStore($fileName, $link)
     {
-        if (!$this->getAttribute('use_image_storage') || !class_exists('\Vis\ImageStorage\Image')) return;
+        if (! $this->getAttribute('use_image_storage') || ! class_exists('\Vis\ImageStorage\Image')) {
+            return;
+        }
 
-        $fileCmsPreview = strpos ($fileName, '.svg') ?
+        $fileCmsPreview = strpos($fileName, '.svg') ?
             $fileName :
             str_replace('/storage/editor/fotos/', '', $link);
 
@@ -214,18 +236,22 @@ class ImageField extends AbstractField
 
     private function checkSizeFile($file)
     {
-        if (!$this->getAttribute('limit_mb')) return;
+        if (! $this->getAttribute('limit_mb')) {
+            return;
+        }
 
         $limitMb = $this->getAttribute('limit_mb') * 1000000;
 
         if ($file->getSize() > $limitMb) {
-            App::abort(500, "Ошибка загрузки файла. Файл больше чем ".$this->getAttribute('limit_mb')." МБ");
+            App::abort(500, 'Ошибка загрузки файла. Файл больше чем '.$this->getAttribute('limit_mb').' МБ');
         }
     }
 
     public function prepareQueryValue($value)
     {
-        if (!$value) return '';
+        if (! $value) {
+            return '';
+        }
 
         return $value;
     }

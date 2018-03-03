@@ -1,23 +1,23 @@
 <?php
 
-return array(
-    'db' => array(
+return [
+    'db' => [
         'table' => 'tb_tree',
-        'order' => array(
+        'order' => [
             'id' => 'ASC',
-        ),
-        'pagination' => array(
+        ],
+        'pagination' => [
             'per_page' => 1,
             'uri' => '/admin/tree',
-        ),
-    ),
-    'options' => array(
+        ],
+    ],
+    'options' => [
         'caption' => '',
         'model' => 'App\Models\Tree',
-    ),
-    'position' => array(
-        'tabs' => array(
-            'Общая'     => array(
+    ],
+    'position' => [
+        'tabs' => [
+            'Общая'     => [
                 'id',
                 'title',
                 'slug',
@@ -26,73 +26,73 @@ return array(
                 'show_in_menu',
                 'created_at',
                 'updated_at',
-            ),
-            'SEO'    => array(
+            ],
+            'SEO'    => [
                 'seo_title',
                 'seo_description',
                 'seo_keywords',
-            ),
-        )
-    ),
-    'fields' => array(
-        'id' => array(
+            ],
+        ],
+    ],
+    'fields' => [
+        'id' => [
             'caption' => '#',
             'type' => 'readonly',
             'class' => 'col-id',
             'width' => '1%',
             'hide' => true,
-            'is_sorting' => true
-        ),
-        'title' => array(
+            'is_sorting' => true,
+        ],
+        'title' => [
             'caption' => 'Заголовок',
             'type' => 'text',
-        ),
-        'description' => array(
+        ],
+        'description' => [
             'caption' => 'Текст',
             'type'    => 'wysiwyg',
-        ),
-        'show_in_menu' => array(
+        ],
+        'show_in_menu' => [
             'caption' => 'Показывать в меню',
             'type' => 'checkbox',
-            'options' => array(
+            'options' => [
                 1 => 'Да',
                 0 => 'Нет',
-            ),
+            ],
             'field' => 'tinyInteger',
-        ),
-        'map' => array(
+        ],
+        'map' => [
             'caption' => 'Карта',
             'type' => 'textarea',
-        ),
-        'created_at' => array(
+        ],
+        'created_at' => [
             'caption' => 'Дата создания',
             'type' => 'datetime',
             'hide' => true,
-        ),
-        'updated_at' => array(
+        ],
+        'updated_at' => [
             'caption' => 'Дата обновления',
             'type' => 'datetime',
             'hide' => true,
-        ),
-        'seo_title' => array(
+        ],
+        'seo_title' => [
             'caption' => 'SEO title',
             'type' => 'text',
-        ),
-        'seo_description' => array(
+        ],
+        'seo_description' => [
             'caption' => 'SEO description',
             'type' => 'textarea',
             'rows' => '2',
-        ),
-        'seo_keywords' => array(
+        ],
+        'seo_keywords' => [
             'caption' => 'SEO keywords',
             'type' => 'text',
-        ),
-        'slug' => array(
+        ],
+        'slug' => [
             'caption' => 'Url',
-            'type' => 'text'
-        ),
-    ),
+            'type' => 'text',
+        ],
+    ],
 
-    'filters' => array(
-    ),
-);
+    'filters' => [
+    ],
+];

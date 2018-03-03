@@ -6,12 +6,13 @@ use Illuminate\Support\Facades\View;
 
 class DefinitionField extends AbstractField
 {
-
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
-        $db->where($table .'.'. $this->getFieldName(), 'LIKE', '%'.$value.'%');
-    } // end onSearchFilter
+        $db->where($table.'.'.$this->getFieldName(), 'LIKE', '%'.$value.'%');
+    }
+
+    // end onSearchFilter
 
     public function getListValue($row)
     {
@@ -21,23 +22,26 @@ class DefinitionField extends AbstractField
                 return $res;
             }
         }
+    }
 
-        return;
-    } // end getListValue
+    // end getListValue
 
     public function onSelectValue(&$db)
     {
-         return;
     }
 
     public function getAttribute($ident, $default = false)
     {
-        if ($ident == 'hide_list') return true;
+        if ($ident == 'hide_list') {
+            return true;
+        }
 
-        return parent::getAttribute ($ident, $default);
-    } // end getAttribute
+        return parent::getAttribute($ident, $default);
+    }
 
-    public function getEditInput($row = array())
+    // end getAttribute
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -47,16 +51,17 @@ class DefinitionField extends AbstractField
         }
 
         $this->attributes['name'] = $this->getFieldName();
-        $this->attributes['table'] = config('builder.tb-definitions.' . $this->getAttribute('definition'). '.db.table');
+        $this->attributes['table'] = config('builder.tb-definitions.'.$this->getAttribute('definition').'.db.table');
 
         $input = View::make('admin::tb.input_definition');
-        $input->nameDefinition  = $this->getAttribute('definition');
-        $input->foreignField  = $this->getAttribute('foreign_field');
-        $input->name  = $this->getFieldName();
+        $input->nameDefinition = $this->getAttribute('definition');
+        $input->foreignField = $this->getAttribute('foreign_field');
+        $input->name = $this->getFieldName();
         $input->table = $this->attributes['table'];
-        $input->attributes = json_encode ($this->attributes);
+        $input->attributes = json_encode($this->attributes);
 
         return $input->render();
-    } // end getEditInput
+    }
 
+    // end getEditInput
 }

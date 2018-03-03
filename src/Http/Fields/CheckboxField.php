@@ -7,28 +7,35 @@ use Illuminate\Support\Facades\Session;
 
 class CheckboxField extends AbstractField
 {
-
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function prepareQueryValue($value)
     {
-        if (!$value && $this->getAttribute('is_null')) return null;
+        if (! $value && $this->getAttribute('is_null')) {
+            return;
+        }
 
         return $value ? '1' : '0';
-    } // end prepareQueryValue
-    
+    }
+
+    // end prepareQueryValue
+
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
-        $db->where($table .'.'. $this->getFieldName(), '=', $value);
-    } // end onSearchFilter
+        $db->where($table.'.'.$this->getFieldName(), '=', $value);
+    }
+
+    // end onSearchFilter
 
     public function getFilterInput()
     {
-        if (!$this->getAttribute('filter')) {
+        if (! $this->getAttribute('filter')) {
             return '';
         }
 
@@ -38,13 +45,15 @@ class CheckboxField extends AbstractField
 
         $table = View::make('admin::tb.filter_checkbox');
         $table->filter = $filter;
-        $table->name  = $this->getFieldName();
+        $table->name = $this->getFieldName();
         $table->options = $this->getAttribute('options');
 
         return $table->render();
-    } // end getFilterInput
+    }
 
-    public function getEditInput($row = array())
+    // end getFilterInput
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -52,15 +61,17 @@ class CheckboxField extends AbstractField
                 return $res;
             }
         }
-       
+
         $table = View::make('admin::tb.input_checkbox');
         $table->value = $this->getValue($row);
-        $table->name  = $this->getFieldName();
+        $table->name = $this->getFieldName();
         $table->caption = $this->getAttribute('caption');
 
         return $table->render();
-    } // end getEditInput
-    
+    }
+
+    // end getEditInput
+
     public function getListValue($row)
     {
         if ($this->hasCustomHandlerMethod('onGetListValue')) {
@@ -69,15 +80,17 @@ class CheckboxField extends AbstractField
                 return $res;
             }
         }
-        
+
         return View::make('admin::tb.input_checkbox_list')->with('is_checked', $this->getValue($row));
-    } // end getListValue
+    }
+
+    // end getListValue
 
     public function getListValueFastEdit($row, $ident)
     {
         $field = $this;
 
-        return view('admin::tb.fast_edit_checkbox', compact ('row', 'ident', 'field'));
+        return view('admin::tb.fast_edit_checkbox', compact('row', 'ident', 'field'));
     }
 
     public function getValue($row, $postfix = '')
@@ -92,11 +105,13 @@ class CheckboxField extends AbstractField
 
         $value = (
             (isset($row[$this->getFieldName()]) && $row[$this->getFieldName()]) ||
-            (!isset($row[$this->getFieldName()]) && $this->getAttribute('not_checked_default') !== true)
+            (! isset($row[$this->getFieldName()]) && $this->getAttribute('not_checked_default') !== true)
 
                 )
                     ? '1' : '0';
 
         return $value;
-    } // end getValue
+    }
+
+    // end getValue
 }

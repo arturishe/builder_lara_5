@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -24,9 +24,9 @@ return array(
     |
     */
 
-    'ignore_environments' => array(
+    'ignore_environments' => [
         // 'local',
-    ),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -80,5 +80,5 @@ return array(
     | value. By default if empty HTTP_HOST would be used.
     |
     */
-    'base_url' => ''
-);
+    'base_url' => '',
+];

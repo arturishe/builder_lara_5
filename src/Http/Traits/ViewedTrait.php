@@ -1,4 +1,6 @@
-<?php namespace Vis\Builder\Helpers\Traits;
+<?php
+
+namespace Vis\Builder\Helpers\Traits;
 
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Request;
@@ -10,7 +12,7 @@ trait ViewedTrait
         $nameClass = strtolower(get_class($this));
         if (isset($this->id) && $this->id) {
             $idPage = $this->id;
-            $nameCookie = md5($nameClass . "_viewed");
+            $nameCookie = md5($nameClass.'_viewed');
             $cookies = unserialize(Cookie::get($nameCookie));
 
             if (is_array($cookies)) {
@@ -28,19 +30,19 @@ trait ViewedTrait
     public function getView()
     {
         $nameClass = strtolower(get_class($this));
-        $nameCookie = md5($nameClass . "_viewed");
+        $nameCookie = md5($nameClass.'_viewed');
 
         $cookies = unserialize(Request::cookie($nameCookie));
 
         if (is_array($cookies) && count($cookies)) {
-            $implodeViewedProductsIds = implode(",", $cookies);
+            $implodeViewedProductsIds = implode(',', $cookies);
 
-            $viewed_products = $nameClass::whereIn("id", $cookies)
+            $viewed_products = $nameClass::whereIn('id', $cookies)
                 ->active()
                 ->orderByRaw("FIELD(id, $implodeViewedProductsIds)")->get();
 
             if (isset($this->id)) {
-                $viewed_products = $viewed_products->where("id", "!=", $this->id);
+                $viewed_products = $viewed_products->where('id', '!=', $this->id);
             }
 
             return $viewed_products;

@@ -4,7 +4,6 @@ namespace Vis\Builder\Fields;
 
 class CustomField extends AbstractField
 {
-
     public function onSearchFilter(&$db, $value)
     {
         if ($this->hasCustomHandlerMethod('onSearchCustomFilter')) {
@@ -13,8 +12,10 @@ class CustomField extends AbstractField
                 return $res;
             }
         }
-    } // end onSearchFilter
-    
+    }
+
+    // end onSearchFilter
+
     public function getValue($row, $postfix = '')
     {
         if ($this->hasCustomHandlerMethod('onGetCustomValue')) {
@@ -23,8 +24,10 @@ class CustomField extends AbstractField
                 return $res;
             }
         }
-    } // end getValue
-    
+    }
+
+    // end getValue
+
     public function getListValue($row)
     {
         if ($this->hasCustomHandlerMethod('onGetCustomListValue')) {
@@ -33,9 +36,11 @@ class CustomField extends AbstractField
                 return $res;
             }
         }
-    } // end getListValue
+    }
 
-    public function getEditInput($row = array())
+    // end getListValue
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetCustomEditInput')) {
             $res = $this->handler->onGetCustomEditInput($this, $row);
@@ -43,12 +48,16 @@ class CustomField extends AbstractField
                 return $res;
             }
         }
-    } // end getEditInput
-    
+    }
+
+    // end getEditInput
+
     public function onSelectValue(&$db)
     {
         if ($this->hasCustomHandlerMethod('onSelectCustomValue')) {
             $this->handler->onSelectCustomValue($db);
         }
-    } // end onSelectValue
+    }
+
+    // end onSelectValue
 }

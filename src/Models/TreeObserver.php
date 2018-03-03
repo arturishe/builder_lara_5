@@ -1,10 +1,11 @@
-<?php namespace Vis\Builder;
+<?php
+
+namespace Vis\Builder;
 
 use Illuminate\Database\Eloquent\Model;
 
 class TreeObserver
 {
-
     public function saving(Model $model)
     {
         $model->clearCache();
@@ -14,7 +15,6 @@ class TreeObserver
     {
         $model->clearCache();
     }
-
 
     public function deleting(Model $model)
     {

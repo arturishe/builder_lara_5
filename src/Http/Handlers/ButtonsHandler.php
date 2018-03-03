@@ -1,4 +1,6 @@
-<?php namespace Vis\Builder\Handlers;
+<?php
+
+namespace Vis\Builder\Handlers;
 
 class ButtonsHandler
 {
@@ -14,13 +16,15 @@ class ButtonsHandler
     public function fetch()
     {
         $buttons = $this->def;
-        
-        if (!count($buttons)) return;
 
-        $buttonsHtml = "";
+        if (! count($buttons)) {
+            return;
+        }
+
+        $buttonsHtml = '';
 
         foreach ($buttons as $button) {
-            $buttonsHtml .=  $this->checkShowButton($button) ? '' : view('admin::tb.button', compact('button'));
+            $buttonsHtml .= $this->checkShowButton($button) ? '' : view('admin::tb.button', compact('button'));
         }
 
         return $buttonsHtml;
@@ -28,7 +32,6 @@ class ButtonsHandler
 
     private function checkShowButton($button)
     {
-        return !$button || !$button['check']();
+        return ! $button || ! $button['check']();
     }
-
 }

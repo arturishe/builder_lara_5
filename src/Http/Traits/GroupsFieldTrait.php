@@ -1,5 +1,6 @@
-<?php namespace Vis\Builder\Helpers\Traits;
+<?php
 
+namespace Vis\Builder\Helpers\Traits;
 
 trait GroupsFieldTrait
 {
@@ -17,11 +18,12 @@ trait GroupsFieldTrait
 
                 return $section;
             } else {
-                return "Поле неправильного  формата";
+                return 'Поле неправильного  формата';
             }
-
         } else {
-            return "Нет такого поля";
+            return 'Нет такого поля';
         }
-    } // end getArrayGroup
+    }
+
+    // end getArrayGroup
 }

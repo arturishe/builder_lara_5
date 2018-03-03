@@ -1,27 +1,27 @@
 <?php
 
-return array(
-    'db' => array(
+return [
+    'db' => [
         'table' => 'article',
-        'order' => array(
+        'order' => [
             'priority' => 'asc',
-        ),
-        'pagination' => array(
+        ],
+        'pagination' => [
             'per_page' => 20,
             'uri' => '/admin/articles',
-        ),
-    ),
-    'cache' => array(
-        'tags' => array('article'),
-    ),
-    'options' => array(
+        ],
+    ],
+    'cache' => [
+        'tags' => ['article'],
+    ],
+    'options' => [
         'caption' => 'Статьи',
         'is_sortable' => true,
         'model' => 'App\Models\Article',
-    ),
-    'position' => array(
-        'tabs' => array(
-            'Общая' => array(
+    ],
+    'position' => [
+        'tabs' => [
+            'Общая' => [
                 'id',
                 'title',
                 'picture',
@@ -30,26 +30,26 @@ return array(
                 'created_at',
                 'updated_at',
                 'is_active',
-            ),
+            ],
 
-            'SEO' => array(
+            'SEO' => [
                 'seo_title',
                 'seo_description',
                 'seo_keywords',
-            ),
-        )
-    ),
-    'fields' => array(
-        'id' => array(
+            ],
+        ],
+    ],
+    'fields' => [
+        'id' => [
             'caption' => '#',
             'type' => 'readonly',
             'class' => 'col-id',
             'width' => '1%',
             'hide' => true,
-            'is_sorting' => false
-        ),
+            'is_sorting' => false,
+        ],
 
-        'picture' => array(
+        'picture' => [
             'caption' => 'Изображение',
             'type' => 'image',
             'storage_type' => 'image', // image|tag|gallery
@@ -60,119 +60,119 @@ return array(
             'hide_list' => true,
             'field' => 'string',
             'is_multiple' => true,
-        ),
-        'title' => array(
+        ],
+        'title' => [
             'caption' => 'Название',
             'type' => 'text',
             'filter' => 'text',
             'is_sorting' => true,
             'field' => 'string',
-        ),
+        ],
 
-        'short_description' => array(
+        'short_description' => [
             'caption' => 'Краткое описание',
             'type'    => 'wysiwyg',
 
             'hide_list' => true,
             'field' => 'text',
-        ),
-        'description' => array(
+        ],
+        'description' => [
             'caption' => 'Полное описание',
             'type'    => 'wysiwyg',
             'hide_list' => true,
             'field' => 'text',
-        ),
+        ],
 
-        'created_at' => array(
+        'created_at' => [
             'caption' => 'Дата создания',
             'type' => 'datetime',
             'is_sorting' => true,
             'months' => 2,
             'field' => 'timestamp',
-        ),
-        'updated_at' => array(
+        ],
+        'updated_at' => [
             'caption' => 'Дата обновления',
             'type' => 'readonly',
             'hide_list' => true,
             'is_sorting' => true,
             'hide'        => true,
             'field' => 'timestamp',
-        ),
-        'is_active' => array(
+        ],
+        'is_active' => [
             'caption' => 'Статья активна',
             'type' => 'checkbox',
-            'options' => array(
+            'options' => [
                 1 => 'Активные',
                 0 => 'He aктивные',
-            ),
+            ],
             'field' => 'tinyInteger',
-        ),
+        ],
 
-        'seo_title' => array(
+        'seo_title' => [
             'caption' => 'Seo: title',
             'type' => 'text',
             'filter' => 'text',
             'hide_list' => true,
             'field' => 'string',
 
-        ),
-        'seo_description' => array(
+        ],
+        'seo_description' => [
             'caption' => 'Seo: description',
             'type' => 'text',
             'filter' => 'text',
             'hide_list' => true,
             'field' => 'text',
 
-        ),
-        'seo_keywords' => array(
+        ],
+        'seo_keywords' => [
             'caption' => 'Seo: keywords',
             'type' => 'text',
             'filter' => 'text',
             'hide_list' => true,
             'field' => 'string',
-        ),
-    ),
-    'filters' => array(
-    ),
-    'actions' => array(
+        ],
+    ],
+    'filters' => [
+    ],
+    'actions' => [
         /* 'search' => array(
              'caption' => 'Поиск',
          ),*/
-        'insert' => array(
+        'insert' => [
             'caption' => 'Добавить',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'preview' => array(
+            },
+        ],
+        'preview' => [
             'caption' => 'Предпросмотр',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'clone' => array(
+            },
+        ],
+        'clone' => [
             'caption' => 'Клонировать',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'update' => array(
+            },
+        ],
+        'update' => [
             'caption' => 'Редактировать',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'revisions' => array(
+            },
+        ],
+        'revisions' => [
             'caption' => 'Версии',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-        'delete' => array(
+            },
+        ],
+        'delete' => [
             'caption' => 'Удалить',
-            'check' => function() {
+            'check' => function () {
                 return true;
-            }
-        ),
-    ),
-);
+            },
+        ],
+    ],
+];

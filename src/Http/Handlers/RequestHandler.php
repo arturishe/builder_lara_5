@@ -1,11 +1,13 @@
-<?php namespace Vis\Builder\Handlers;
+<?php
 
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\URL;
-use Vis\Builder\JarboeController;
+namespace Vis\Builder\Handlers;
+
 use Vis\Builder\Revision;
+use Vis\Builder\JarboeController;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Response;
 
 class RequestHandler
 {
@@ -25,25 +27,25 @@ class RequestHandler
         switch (request('query_type')) {
             case 'search':
                 return $this->handleSearchAction();
-                
+
             case 'change_order':
                 return $this->handleChangeOrderAction();
-                
+
             case 'multi_action':
                 return $this->handleMultiAction();
-                
+
             case 'multi_action_with_option':
                 return $this->handleMultiActionWithOption();
-            
+
             case 'import':
                 return $this->handleImport();
-                
+
             case 'get_import_template':
                 return $this->handleImportTemplateDownload();
-                
+
             case 'export':
                 return $this->handleExport();
-                
+
             case 'set_per_page':
                 return $this->handleSetPerPageAmountAction();
 
@@ -85,7 +87,7 @@ class RequestHandler
 
             case 'upload_file':
                 return $this->handleFileUpload();
-                
+
             case 'many_to_many_ajax_search':
                 return $this->handleManyToManyAjaxSearch();
 
@@ -136,7 +138,7 @@ class RequestHandler
         $field = $this->controller->getField(request('ident'));
 
         $data = $field->getAjaxSearchResult(request('q'), request('limit'), request('page'));
-        
+
         return Response::json($data);
     }
 
@@ -148,7 +150,7 @@ class RequestHandler
 
         return Response::json($data);
     }
-    
+
     protected function handleChangeOrderAction()
     {
         $this->controller->query->clearCache();
@@ -159,108 +161,109 @@ class RequestHandler
         ) {
             return Response::json([
                 'status' => false,
-                'message' => 'Изменение порядка невозможно при фильтрации и сортировки'
+                'message' => 'Изменение порядка невозможно при фильтрации и сортировки',
             ]);
         }
 
-        $pageThisCount = request('params') ? : 1;
+        $pageThisCount = request('params') ?: 1;
 
         $perPage = $this->controller->query->getPerPageAmount($this->definition['db']['pagination']['per_page']);
 
         $lowest = ($pageThisCount * $perPage) - $perPage;
-        
+
         foreach ($order['sort'] as $id) {
-            ++$lowest;
-            \DB::table($this->definition['db']['table'])->where('id', $id)->update(array(
-                'priority' => $lowest
-            ));
+            $lowest++;
+            \DB::table($this->definition['db']['table'])->where('id', $id)->update([
+                'priority' => $lowest,
+            ]);
         }
-        
+
         return Response::json(['status' => true]);
     }
-    
+
     protected function handleMultiAction()
     {
         $type = request('type');
         $ids = request('multi_ids');
 
-        if (!$ids) return;
+        if (! $ids) {
+            return;
+        }
 
         $action = $this->definition['multi_actions'][$type];
 
         $isAllowed = $action['check'];
 
-        if (!$isAllowed()) {
-            throw new \RuntimeException('Multi action not allowed: '. $type);
+        if (! $isAllowed()) {
+            throw new \RuntimeException('Multi action not allowed: '.$type);
         }
 
         $handlerClosure = $action['handle'];
 
-        $arrayIds = explode (',', $ids);
+        $arrayIds = explode(',', $ids);
 
         $data = $handlerClosure($arrayIds);
-        
+
         $data['ids'] = $arrayIds;
         $data['is_hide_rows'] = false;
 
         if (isset($action['is_hide_rows'])) {
             $data['is_hide_rows'] = $action['is_hide_rows'];
         }
-        
+
         return Response::json($data);
     }
-    
+
     protected function handleMultiActionWithOption()
     {
-
         $type = Input::get('type');
         $option = Input::get('option');
         $action = $this->definition['multi_actions'][$type];
-        
+
         $isAllowed = $action['check'];
-        if (!$isAllowed()) {
-            throw new \RuntimeException('Multi action not allowed: '. $type);
+        if (! $isAllowed()) {
+            throw new \RuntimeException('Multi action not allowed: '.$type);
         }
-        
-        $ids = Input::get('multi_ids', array());
+
+        $ids = Input::get('multi_ids', []);
         $handlerClosure = $action['handle'];
         $data = $handlerClosure($ids, $option);
-        
+
         $data['ids'] = $ids;
         $data['is_hide_rows'] = false;
 
         if (isset($action['is_hide_rows'])) {
             $data['is_hide_rows'] = $action['is_hide_rows'];
         }
-        
+
         return Response::json($data);
     }
-    
+
     protected function handleImportTemplateDownload()
     {
         $type = Input::get('type');
-        $method = 'do'. ucfirst($type) .'TemplateDownload';
-        
+        $method = 'do'.ucfirst($type).'TemplateDownload';
+
         $this->controller->import->$method();
     }
-    
+
     protected function handleImport()
     {
-        $file   = Input::file('file');
-        $type   = request('type');
-        $method = 'doImport'. ucfirst($type);
+        $file = Input::file('file');
+        $type = request('type');
+        $method = 'doImport'.ucfirst($type);
 
         return Response::json([
-            'status' => $this->controller->import->$method($file)
+            'status' => $this->controller->import->$method($file),
         ]);
     }
-    
+
     protected function handleExport()
     {
-        $type   = request('type');
-        $method = 'doExport'. ucfirst($type);
-        $idents = array_keys(request('b', array()));
-        
+        $type = request('type');
+        $method = 'doExport'.ucfirst($type);
+        $idents = array_keys(request('b', []));
+
         $this->controller->export->$method($idents);
     }
 
@@ -268,29 +271,29 @@ class RequestHandler
     {
         $perPage = request('per_page');
 
-        $sessionPath = 'table_builder.' . $this->definitionName . '.per_page';
+        $sessionPath = 'table_builder.'.$this->definitionName.'.per_page';
         Session::put($sessionPath, $perPage);
 
         return Response::json([
-            'url' => $this->controller->getOption('url')
+            'url' => $this->controller->getOption('url'),
         ]);
     }
-    
+
     protected function handleChangeDirection()
     {
-        $order = array(
+        $order = [
             'direction' => Input::get('direction'),
-            'field' => Input::get('field')
-        );
+            'field' => Input::get('field'),
+        ];
 
-        $sessionPath = 'table_builder.' . $this->definitionName . '.order';
+        $sessionPath = 'table_builder.'.$this->definitionName.'.order';
         Session::put($sessionPath, $order);
 
         return Response::json([
-            'url' => $this->controller->getOption('url')
+            'url' => $this->controller->getOption('url'),
         ]);
     }
-    
+
     protected function handleFileUpload()
     {
         $file = Input::file('file');
@@ -298,43 +301,47 @@ class RequestHandler
 
         if ($this->controller->hasCustomHandlerMethod('onFileUpload')) {
             $res = $this->controller->getCustomHandler()->onFileUpload($file);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
-        
-        $extension = $file->getClientOriginalExtension();
-        $nameFile = explode(".", $file->getClientOriginalName());
-        $fileName  = \Jarboe::urlify($nameFile[0]) .'.'. $extension;
 
-        if (file_exists(public_path() . '/' . $prefixPath . $fileName)) {
-            $fileName = \Jarboe::urlify($nameFile[0]) . '_' . time() . '.'. $extension;
+        $extension = $file->getClientOriginalExtension();
+        $nameFile = explode('.', $file->getClientOriginalName());
+        $fileName = \Jarboe::urlify($nameFile[0]).'.'.$extension;
+
+        if (file_exists(public_path().'/'.$prefixPath.$fileName)) {
+            $fileName = \Jarboe::urlify($nameFile[0]).'_'.time().'.'.$extension;
         }
-        
+
         $destinationPath = $prefixPath;
 
         $file->move($destinationPath, $fileName);
 
-        $data = array(
+        $data = [
             'status' => true,
-            'link'   => URL::to($destinationPath . $fileName),
+            'link'   => URL::to($destinationPath.$fileName),
             'short_link' => $fileName,
-            'long_link' =>  "/". $destinationPath . $fileName,
-        );
+            'long_link' =>  '/'.$destinationPath.$fileName,
+        ];
 
         return Response::json($data);
     }
-    
+
     protected function handlePhotoUpload()
     {
         $this->controller->query->clearCache();
 
         $baseIdent = request('baseIdent');
-        $file  = Input::file('image');
+        $file = Input::file('image');
 
         $field = $this->controller->getField($baseIdent);
-        
+
         if ($this->controller->hasCustomHandlerMethod('onPhotoUpload')) {
             $res = $this->controller->getCustomHandler()->onPhotoUpload($field, $file);
-            if ($res) return $res;
+            if ($res) {
+                return $res;
+            }
         }
 
         $data = $field->doUpload($file);
@@ -355,7 +362,7 @@ class RequestHandler
     protected function handleFastSaveAction()
     {
         $result = $this->controller->query->fastSave(Input::all());
-        $result['status'] = "ok";
+        $result['status'] = 'ok';
 
         return Response::json($result);
     }
@@ -366,7 +373,7 @@ class RequestHandler
         $this->checkEditPermission($idRow);
         $result = $this->controller->query->cloneRow($idRow);
 
-        $result['html'] = "ok";
+        $result['html'] = 'ok';
 
         return Response::json($result);
     }
@@ -406,7 +413,7 @@ class RequestHandler
 
         return Response::json([
             'html' => $html,
-            'status' => true
+            'status' => true,
         ]);
     }
 
@@ -419,7 +426,7 @@ class RequestHandler
 
         return Response::json([
             'html' => $html,
-            'status' => true
+            'status' => true,
         ]);
     }
 
@@ -432,13 +439,13 @@ class RequestHandler
 
         return Response::json([
             'html' => $html,
-            'status' => true
+            'status' => true,
         ]);
     }
 
     protected function handleReturnRevisions()
     {
-        $idRevision = request("id");
+        $idRevision = request('id');
         $thisRevision = Revision::find($idRevision);
 
         $model = $thisRevision->revisionable_type;
@@ -452,21 +459,22 @@ class RequestHandler
 
     protected function checkEditPermission($id)
     {
-        
     }
 
     private function getRowID()
     {
-        if (request('id')) return request('id');
+        if (request('id')) {
+            return request('id');
+        }
 
-        throw new \RuntimeException("Undefined row id for action.");
+        throw new \RuntimeException('Undefined row id for action.');
     }
 
     protected function handleShowList()
     {
-        return array(
+        return [
            'showList' => $this->controller->view->showList(),
-        );
+        ];
     }
 
     protected function handleShowHtmlForeignDefinition()
@@ -481,16 +489,16 @@ class RequestHandler
 
     protected function handleChangePositionDefinition()
     {
-        return array(
+        return [
             'result' => $this->controller->view->changePositionDefinition(),
-        );
+        ];
     }
 
     protected function handleClearOrderBy()
     {
-        return array(
+        return [
             'result' => $this->controller->query->clearOrderBy(),
-        );
+        ];
     }
 
     protected function handleSearchAction()
@@ -498,15 +506,15 @@ class RequestHandler
         $this->prepareSearchFilters();
 
         return Response::json([
-            'url' => $this->controller->getOption ('url') . '?catalog=' . request ('catalog')
+            'url' => $this->controller->getOption('url').'?catalog='.request('catalog'),
         ]);
     }
 
     private function prepareSearchFilters()
     {
-        $filters = request('filter', array());
+        $filters = request('filter', []);
 
-        $newFilters = array();
+        $newFilters = [];
         foreach ($filters as $key => $value) {
             if (is_array($value)) {
                 if (isset($value['from']) && $value['from']) {
@@ -526,7 +534,7 @@ class RequestHandler
             $this->controller->getCustomHandler()->onPrepareSearchFilters($newFilters);
         }
 
-        $sessionPath = 'table_builder.' . $this->definitionName . '.filters';
+        $sessionPath = 'table_builder.'.$this->definitionName.'.filters';
         Session::put($sessionPath, $newFilters);
     }
 }

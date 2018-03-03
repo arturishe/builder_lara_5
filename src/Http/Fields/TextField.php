@@ -1,51 +1,57 @@
-<?php namespace Vis\Builder\Fields;
+<?php
+
+namespace Vis\Builder\Fields;
 
 use Illuminate\Support\Facades\View;
 
 class TextField extends AbstractField
 {
-
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function onSearchFilter(&$db, $value)
     {
-  
         $tabs = $this->getAttribute('tabs');
 
-        $table = $this->getAttribute('extends_table') ? : $this->definition['db']['table'] ;
+        $table = $this->getAttribute('extends_table') ?: $this->definition['db']['table'];
 
         if ($tabs) {
-            $field = $table .'.'. $this->getFieldName();
+            $field = $table.'.'.$this->getFieldName();
             $db->where(function ($query) use ($field, $value, $tabs) {
                 foreach ($tabs as $tab) {
-                    $query->orWhere($field . $tab['postfix'], 'LIKE', '%'.$value.'%');
+                    $query->orWhere($field.$tab['postfix'], 'LIKE', '%'.$value.'%');
                 }
             });
         } else {
-            $db->where($table .'.'. $this->getFieldName(), 'LIKE', '%'.$value.'%');
+            $db->where($table.'.'.$this->getFieldName(), 'LIKE', '%'.$value.'%');
         }
-    } // end onSearchFilter
-    
+    }
+
+    // end onSearchFilter
+
     public function getSubActions()
     {
         $def = $this->getAttribute('subactions');
-        if (!$def) {
+        if (! $def) {
             return '';
         }
-        
-        $subactions = array();
+
+        $subactions = [];
         foreach ($def as $options) {
-            $class = '\\Yaro\\Jarboe\\Fields\\Subactions\\'. ucfirst($options['type']);
+            $class = '\\Yaro\\Jarboe\\Fields\\Subactions\\'.ucfirst($options['type']);
             $subactions[] = new $class($options);
         }
-        
-        return View::make('admin::tb.subactions', compact('subactions'))->render();
-    } // end getSubActions
 
-    public function getEditInput($row = array())
+        return View::make('admin::tb.subactions', compact('subactions'))->render();
+    }
+
+    // end getSubActions
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -55,20 +61,20 @@ class TextField extends AbstractField
         }
 
         $type = $this->getAttribute('type');
-        $input = View::make('admin::tb.input_'. $type);
+        $input = View::make('admin::tb.input_'.$type);
         $input->value = $this->getValue($row);
-        $input->name  = $this->getFieldName();
-        $input->rows  = $this->getAttribute('rows');
-        $input->mask  = $this->getAttribute('mask');
-        $input->custom_type  = $this->getAttribute('custom_type');
+        $input->name = $this->getFieldName();
+        $input->rows = $this->getAttribute('rows');
+        $input->mask = $this->getAttribute('mask');
+        $input->custom_type = $this->getAttribute('custom_type');
         $input->multi = $this->getAttribute('multi');
 
         if ($input->multi) {
-            $input->name = $input->name . "[]";
+            $input->name = $input->name.'[]';
             $input->value = json_decode($input->value);
         }
 
-        if ( $input->name == request('foreign_field')) {
+        if ($input->name == request('foreign_field')) {
             $input->value = request('foreign_field_id');
         }
 
@@ -80,7 +86,9 @@ class TextField extends AbstractField
         $input->transliteration = $this->getAttribute('transliteration');
 
         return $input->render();
-    } // end getEditInput
+    }
+
+    // end getEditInput
 
     public function getListValue($row)
     {
@@ -92,21 +100,21 @@ class TextField extends AbstractField
         }
 
         if ($this->getAttribute('fast_edit')) {
-            $html = "<p>".parent::getListValue($row)."</p>";
+            $html = '<p>'.parent::getListValue($row).'</p>';
+
             return $html;
         }
 
         if ($this->getAttribute('multi')) {
+            $arrayValue = json_decode($this->getValue($row));
 
-           $arrayValue = json_decode($this->getValue($row));
-
-           if (is_array($arrayValue)) {
-              
-               return implode("<br>", $arrayValue);
-           }
-
+            if (is_array($arrayValue)) {
+                return implode('<br>', $arrayValue);
+            }
         }
 
-        return $this->getValue($row);;
-    } // end getListValue
+        return $this->getValue($row);
+    }
+
+    // end getListValue
 }

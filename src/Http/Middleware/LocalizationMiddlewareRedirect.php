@@ -1,4 +1,6 @@
-<?php namespace Vis\Builder;
+<?php
+
+namespace Vis\Builder;
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
@@ -21,39 +23,40 @@ class LocalizationMiddlewareRedirect extends LaravelLocalizationMiddlewareBase
             return $next($request);
         }
         if (class_exists('laravellocalization')) {
-            $currentLocale = app ('laravellocalization')->getCurrentLocale ();
-            $defaultLocale = app ('laravellocalization')->getDefaultLocale ();
-            $params = explode ('/', $request->path ());
-            if (count ($params) > 0) {
+            $currentLocale = app('laravellocalization')->getCurrentLocale();
+            $defaultLocale = app('laravellocalization')->getDefaultLocale();
+            $params = explode('/', $request->path());
+            if (count($params) > 0) {
                 $localeCode = $params[0];
-                $locales = app ('laravellocalization')->getSupportedLocales ();
+                $locales = app('laravellocalization')->getSupportedLocales();
                 $hideDefaultLocale
-                    = app ('laravellocalization')->hideDefaultLocaleInURL ();
+                    = app('laravellocalization')->hideDefaultLocaleInURL();
                 $redirection = false;
-                if (!empty($locales[$localeCode])) {
+                if (! empty($locales[$localeCode])) {
                     if ($localeCode === $defaultLocale && $hideDefaultLocale) {
                         $redirection
-                            = app ('laravellocalization')->getNonLocalizedURL ();
+                            = app('laravellocalization')->getNonLocalizedURL();
                     }
                 } elseif ($currentLocale !== $defaultLocale
-                    || !$hideDefaultLocale
+                    || ! $hideDefaultLocale
                 ) {
                     // If the current url does not contain any locale
                     // The system redirect the user to the very same url "localized"
                     // we use the current locale to redirect him
                     $redirection
-                        = app ('laravellocalization')->getLocalizedURL (session ('locale'),
-                        $request->fullUrl ());
+                        = app('laravellocalization')->getLocalizedURL(session('locale'),
+                        $request->fullUrl());
                 }
                 if ($redirection) {
                     // Save any flashed data for redirect
-                    app ('session')->reflash ();
+                    app('session')->reflash();
+
                     return new RedirectResponse($redirection, 301,
                         ['Vary' => 'Accept-Language']);
                 }
             }
         }
-        
+
         return $next($request);
     }
 }

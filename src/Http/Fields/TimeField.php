@@ -7,28 +7,29 @@ use Illuminate\Support\Facades\Session;
 
 class TimeField extends AbstractField
 {
-
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
         if ($this->getAttribute('is_range')) {
-            if (!isset($value['from']) && !isset($value['to'])) {
+            if (! isset($value['from']) && ! isset($value['to'])) {
                 return;
             }
 
             $valueFrom = isset($value['from']) ? $value['from'] : '00:00';
             $valueTo = isset($value['to']) ? $value['from'] : '23:59';
             $db->whereBetween(
-                $table .'.'. $this->getFieldName(),
+                $table.'.'.$this->getFieldName(),
                 [$valueFrom, $valueTo]
             );
         } else {
             $db->where(
-                $table .'.'. $this->getFieldName(),
+                $table.'.'.$this->getFieldName(),
                 $value
             );
         }
-    } // end onSearchFilter
+    }
+
+    // end onSearchFilter
 
     public function getListValue($row)
     {
@@ -39,15 +40,16 @@ class TimeField extends AbstractField
             }
         }
 
-        if (!$this->getValue($row)) {
+        if (! $this->getValue($row)) {
             return '';
         }
 
         return $this->getValue($row);
-    } // end getListValue
+    }
 
+    // end getListValue
 
-    public function getEditInput($row = array())
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -60,17 +62,19 @@ class TimeField extends AbstractField
         $value = $value ? $value : '';
 
         $input = View::make('admin::tb.input_time');
-        $input->value  = $value;
-        $input->name   = $this->getFieldName();
+        $input->value = $value;
+        $input->name = $this->getFieldName();
         $input->prefix = $row ? 'e-' : 'c-';
         $input->comment = $this->getAttribute('comment');
 
         return $input->render();
-    } // end getEditInput
+    }
+
+    // end getEditInput
 
     public function getFilterInput()
     {
-        if (!$this->getAttribute('filter')) {
+        if (! $this->getAttribute('filter')) {
             return '';
         }
 
@@ -87,13 +91,15 @@ class TimeField extends AbstractField
         $input->value = $filter;
 
         return $input->render();
-    } // end getFilterInput
+    }
+
+    // end getFilterInput
 
     private function getFilterRangeInput()
     {
         $definitionName = $this->getOption('def_name');
         $sessionPath = 'table_builder.'.$definitionName.'.filters.'.$this->getFieldName();
-        $filter = Session::get($sessionPath, array());
+        $filter = Session::get($sessionPath, []);
 
         $input = View::make('admin::tb.filter_time_range');
         $input->name = $this->getFieldName();
@@ -102,5 +108,7 @@ class TimeField extends AbstractField
         $input->months = $this->getAttribute('months');
 
         return $input->render();
-    } // end getFilterRangeInput
+    }
+
+    // end getFilterRangeInput
 }

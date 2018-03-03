@@ -4,11 +4,12 @@ namespace Vis\Builder\Fields;
 
 class WysiwygField extends AbstractField
 {
-
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function getListValue($row)
     {
@@ -18,11 +19,13 @@ class WysiwygField extends AbstractField
                 return $res;
             }
         }
-        
-        return mb_substr(strip_tags($this->getValue($row)), 0, 300) . '...';
-    } // end getListValue
-    
-    public function getEditInput($row = array())
+
+        return mb_substr(strip_tags($this->getValue($row)), 0, 300).'...';
+    }
+
+    // end getListValue
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -33,7 +36,7 @@ class WysiwygField extends AbstractField
 
         $input = \View::make('admin::tb.input_wysiwyg_redactor');
         $input->value = $this->getValue($row);
-        $input->name  = $this->getFieldName();
+        $input->name = $this->getFieldName();
         $input->toolbar = $this->getAttribute('toolbar');
         $input->comment = $this->getAttribute('comment');
         $input->inlineStyles = $this->getAttribute('inlineStyles');
@@ -46,10 +49,11 @@ class WysiwygField extends AbstractField
         $input->action = $action;
 
         return $input->render();
-    } // end getEditInput
+    }
 
-    
-    public function getTabbedEditInput($row = array())
+    // end getEditInput
+
+    public function getTabbedEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetTabbedEditInput')) {
             $res = $this->handler->onGetTabbedEditInput($this, $row);
@@ -60,38 +64,41 @@ class WysiwygField extends AbstractField
 
         $input = \View::make('admin::tb.tab_input_wysiwyg_redactor');
         $input->value = $this->getValue($row);
-        $input->name  = $this->getFieldName();
+        $input->name = $this->getFieldName();
         $input->toolbar = $this->getAttribute('toolbar');
         $input->tabs = $this->getPreparedTabs($row);
         $input->caption = $this->getAttribute('caption');
         $input->inlineStyles = $this->getAttribute('inlineStyles');
         $input->options = $this->getAttribute('options');
         $input->comment = $this->getAttribute('comment');
-        
+
         $action = $this->getUrlAction();
         if (isset($this->definition['options']['action_url_tree'])) {
             $action = $this->definition['options']['action_url_tree'];
         }
         $input->action = $action;
         $input->pre = $row ? 'e' : 'c';
-        
-        
+
         return $input->render();
-    } // end getTabbedEditInput
+    }
+
+    // end getTabbedEditInput
 
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
         $tabs = $this->getAttribute('tabs');
         if ($tabs) {
-            $field = $table .'.'. $this->getFieldName();
+            $field = $table.'.'.$this->getFieldName();
             $db->where(function ($query) use ($field, $value, $tabs) {
                 foreach ($tabs as $tab) {
-                    $query->orWhere($field . $tab['postfix'], 'LIKE', '%'.$value.'%');
+                    $query->orWhere($field.$tab['postfix'], 'LIKE', '%'.$value.'%');
                 }
             });
         } else {
-            $db->where($table .'.'. $this->getFieldName(), 'LIKE', '%'.$value.'%');
+            $db->where($table.'.'.$this->getFieldName(), 'LIKE', '%'.$value.'%');
         }
-    } // end onSearchFilter
+    }
+
+    // end onSearchFilter
 }

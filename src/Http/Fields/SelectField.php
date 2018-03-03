@@ -7,21 +7,24 @@ use Illuminate\Support\Facades\Session;
 
 class SelectField extends AbstractField
 {
-
     public function isEditable()
     {
         return true;
-    } // end isEditable
+    }
+
+    // end isEditable
 
     public function onSearchFilter(&$db, $value)
     {
         $table = $this->definition['db']['table'];
-        $db->where($table .'.'. $this->getFieldName(), '=', $value);
-    } // end onSearchFilter
+        $db->where($table.'.'.$this->getFieldName(), '=', $value);
+    }
+
+    // end onSearchFilter
 
     public function getFilterInput()
     {
-        if (!$this->getAttribute('filter')) {
+        if (! $this->getAttribute('filter')) {
             return '';
         }
 
@@ -31,13 +34,15 @@ class SelectField extends AbstractField
 
         $table = View::make('admin::tb.filter_select');
         $table->filter = $filter;
-        $table->name  = $this->getFieldName();
+        $table->name = $this->getFieldName();
         $table->options = $this->getAttribute('options');
 
         return $table->render();
-    } // end getFilterInput
+    }
 
-    public function getEditInput($row = array())
+    // end getFilterInput
+
+    public function getEditInput($row = [])
     {
         if ($this->hasCustomHandlerMethod('onGetEditInput')) {
             $res = $this->handler->onGetEditInput($this, $row);
@@ -48,7 +53,7 @@ class SelectField extends AbstractField
 
         $table = View::make('admin::tb.input_select');
         $table->selected = $this->getValue($row);
-        $table->name  = $this->getFieldName();
+        $table->name = $this->getFieldName();
         $options = $this->getAttribute('options');
         if (is_callable($options)) {
             $table->options = $options();
@@ -60,7 +65,9 @@ class SelectField extends AbstractField
         $table->readonly_for_edit = $this->getAttribute('readonly_for_edit');
 
         return $table->render();
-    } // end getEditInput
+    }
+
+    // end getEditInput
 
     public function getListValue($row)
     {
@@ -80,13 +87,14 @@ class SelectField extends AbstractField
             $options = $optionsRes;
         }
 
-
         if (isset($options[$val])) {
             return $options[$val];
         } else {
             return $val;
         }
-    } // end getListValue
+    }
+
+    // end getListValue
 
     public function getRowColor($row)
     {

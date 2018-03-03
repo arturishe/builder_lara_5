@@ -2,19 +2,21 @@
 
 class Breadcrumbs extends ArrayObject
 {
-    private $breadcrumbs = array();
+    private $breadcrumbs = [];
 
     public function __construct($current)
     {
         $breadcrumbs = $current->getAncestorsAndSelf();
 
         foreach ($breadcrumbs as $breadcrumb) {
-            $this->breadcrumbs[] = array(
+            $this->breadcrumbs[] = [
                 'url'   => $breadcrumb->getUrl(),
                 'title' => $breadcrumb->t('title'),
-            );
+            ];
         }
-    } // end __construct
+    }
+
+    // end __construct
 
     public function __get($name)
     {
@@ -23,22 +25,26 @@ class Breadcrumbs extends ArrayObject
         }
 
         throw new RuntimeException('Breadcrumbs error!');
-    } // end __get
+    }
+
+    // end __get
 
     public function add($url = '', $title = '')
     {
         if ($url && $title) {
-            $this->breadcrumbs[] = array(
+            $this->breadcrumbs[] = [
                 'url'   => $url,
                 'title' => $title,
-            );
+            ];
         } else {
-            $this->breadcrumbs[] = array(
+            $this->breadcrumbs[] = [
                 'url'   => '',
                 'title' => '...',
-            );
+            ];
         }
-    } // end add
+    }
+
+    // end add
 
     public function pop()
     {

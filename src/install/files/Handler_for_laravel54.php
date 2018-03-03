@@ -7,7 +7,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Handler extends ExceptionHandler
+class Handler_for_laravel54 extends ExceptionHandler
 {
     /**
      * A list of the exception types that should not be reported.
@@ -50,11 +50,11 @@ class Handler extends ExceptionHandler
         }
 
         if ($request->isXmlHttpRequest()) {
-            $data = array(
-                "status" => "error",
-                "code" => $e->getCode(),
-                "message" => class_basename($e) . ' in ' . basename($e->getFile()) . ' line ' . $e->getLine() . ': ' . $e->getMessage(),
-            );
+            $data = [
+                'status' => 'error',
+                'code' => $e->getCode(),
+                'message' => class_basename($e).' in '.basename($e->getFile()).' line '.$e->getLine().': '.$e->getMessage(),
+            ];
 
             return response()->json($data, 500);
         }
